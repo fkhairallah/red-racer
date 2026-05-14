@@ -109,6 +109,11 @@ export interface DistancePrefs {
   speedUnit: 'kts' | 'kmh' | 'mph';
 }
 
+export interface ManualWind {
+  speed: number;     // knots TWS
+  direction: number; // degrees true TWD
+}
+
 export interface AppSettings {
   bearing: BearingPrefs;
   distance: DistancePrefs;
@@ -116,4 +121,6 @@ export interface AppSettings {
   email: string;
   appVersion: string;
   numberOfRuns: number;
+  instrumentMode: 'instruments' | 'manual';
+  manualWind: ManualWind;
 }

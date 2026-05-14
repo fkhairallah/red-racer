@@ -19,11 +19,15 @@ export function parsePolarXML(xmlStr: string, defaultName: string): Polars {
 
   const entries: PolarEntry[] = [];
 
-  // Support both <point tws="..." twa="..." v="..." vmg="..." /> and nested structures
+  // Support flat <point tws="..." twa="..." v="..." vmg="..." />
+  // and grouped <windspeed tws="..."><point twa="..." vb="..." vmg="..." /></windspeed>
   doc.querySelectorAll('point, polar').forEach((el) => {
-    const tws = parseFloat(el.getAttribute('tws') ?? el.querySelector('tws')?.textContent ?? '0');
+    const parentTws = el.parentElement?.getAttribute('tws') ?? '0';
+    const tws = parseFloat(el.getAttribute('tws') ?? el.querySelector('tws')?.textContent ?? parentTws);
     const twa = parseFloat(el.getAttribute('twa') ?? el.querySelector('twa')?.textContent ?? '0');
-    const v = parseFloat(el.getAttribute('v') ?? el.querySelector('v')?.textContent ?? '0');
+    const v = parseFloat(
+      el.getAttribute('v') ?? el.getAttribute('vb') ?? el.querySelector('v')?.textContent ?? '0'
+    );
     const vmg = parseFloat(el.getAttribute('vmg') ?? el.querySelector('vmg')?.textContent ?? '0');
     const heel = parseFloat(el.getAttribute('heel') ?? el.querySelector('heel')?.textContent ?? '0');
 
@@ -37,15 +41,16 @@ export function parsePolarXML(xmlStr: string, defaultName: string): Polars {
 
 // Built-in polar files available in public/polar-resources/
 export const BUILTIN_POLARS = [
-  { label: 'Frers 33', file: 'Frers_33.xml' },
-  { label: 'Farr 40', file: 'Farr 40.xml' },
-  { label: 'X44.2', file: 'X442.xml' },
-  { label: 'J/22', file: 'J22_polars.xml' },
-  { label: 'Schock 34', file: 'Schock34_polars.xml' },
-  { label: 'B367', file: 'B367_polars.xml' },
-  { label: 'Melges 32', file: 'Melges32.xml' },
-  { label: 'Tartan 4100', file: 'Tartan4100.xml' },
-  { label: 'J/109', file: 'J109.xml' },
+  { label: "Frers 33", file: "Frers_33.xml" },
+  { label: "Farr 40", file: "Farr 40.xml" },
+  { label: "X44.2", file: "X442.xml" },
+  { label: "Flying Scot", file: "flying-scot.xml" },
+  { label: "J/22", file: "J22_polars.xml" },
+  { label: "Schock 34", file: "Schock34_polars.xml" },
+  { label: "B367", file: "B367_polars.xml" },
+  { label: "Melges 32", file: "Melges32.xml" },
+  { label: "Tartan 4100", file: "Tartan4100.xml" },
+  { label: "J/109", file: "J109.xml" },
 ];
 
 // Simple target lookup: find closest polar entry for given TWS/TWA

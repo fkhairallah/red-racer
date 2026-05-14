@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { SailPoint } from '../types';
 import { geoService } from '../lib/geolocation';
+import { useSettingsStore } from './settingsStore';
 
 interface GeoState {
   currentPoint: SailPoint | null;
@@ -18,9 +19,21 @@ interface GeoState {
 
 export const useGeoStore = create<GeoState>((set, get) => {
   const onPoint = (point: SailPoint) => {
+    const { instrumentMode, manualWind } = useSettingsStore.getState();
+    let enriched = point;
+    if (instrumentMode === 'manual') {
+      // TWA: angle of wind relative to course, signed (-180 port … +180 starboard)
+      const twa = ((manualWind.direction - point.courseOverGround + 540) % 360) - 180;
+      enriched = {
+        ...point,
+        trueWindSpeed: manualWind.speed,
+        trueWindDirection: manualWind.direction,
+        trueWindAngle: twa,
+      };
+    }
     const s = get();
-    const track = s.isSavingTrack ? [...s.track, point] : s.track;
-    set({ currentPoint: point, isConnected: geoService.isConnected, accuracy: geoService.accuracy, track });
+    const track = s.isSavingTrack ? [...s.track, enriched] : s.track;
+    set({ currentPoint: enriched, isConnected: geoService.isConnected, accuracy: geoService.accuracy, track });
   };
 
   return {

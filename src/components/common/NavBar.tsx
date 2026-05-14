@@ -40,7 +40,10 @@ export function TopBar({ title }: { title?: string }) {
   return (
     <header className="fixed top-0 left-0 right-0 bg-red-700 text-white flex items-center h-12 px-3 z-50 safe-area-inset-top">
       {canGoBack ? (
-        <button onClick={() => navigate(-1)} className="text-sm px-2 py-1 mr-2">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-1 bg-white text-red-700 font-bold text-sm px-3 py-1 rounded-full mr-2 active:bg-red-50"
+        >
           ‹ Back
         </button>
       ) : (
