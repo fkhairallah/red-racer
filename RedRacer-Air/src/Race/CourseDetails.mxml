@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		xmlns:Components="Components.*"
+		viewActivate="view1_viewActivateHandler(event)"
+		title="Course Details">
+	
+	<s:states>
+		<s:State name="portrait"/>
+		<s:State name="landscape"/>
+	</s:states>
+	<s:layout>
+		<s:VerticalLayout paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5" />
+	</s:layout>
+
+	<fx:Script>
+		<![CDATA[
+			import mx.core.FlexGlobals;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.ViewNavigatorEvent;
+			
+			import Line.CourseDefinition;
+			import Line.CourseListOfMarks;
+			
+			import Model.Course.CourseMark;
+			
+			import Tools.LocatePoint;
+			import Tools.NavigateSegment;
+			
+			protected function view1_viewActivateHandler(event:ViewNavigatorEvent):void
+			{
+				// update next mark info, if we don't have one ==> define screen
+				var mark:CourseMark = gVar.course.nextMark;
+				if (mark == null) 
+				{
+					navigator.replaceView(CourseDefinition);
+				}
+			}
+			
+			protected function nextMark_clickHandler(event:MouseEvent):void
+			{
+				navigator.pushView(LocatePoint,gVar.course.nextMark);
+			}
+			
+			
+			protected function lstLegs_changeHandler(event:IndexChangeEvent):void
+			{
+				if (lstLegs.selectedItem.isValid)
+					navigator.pushView(NavigateSegment,lstLegs.selectedItem);
+				else
+					navigator.pushView(CourseListOfMarks);
+			}
+			
+
+		]]>
+	</fx:Script>
+	
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:VGroup horizontalAlign="center" width="100%">
+		<s:Label fontSize="24" text="{gVar.course.courseString}" width="100%" textAlign="center"/>
+		<s:Label text="Repeated {gVar.course.repeat} times"  width="100%" textAlign="center"/>
+		<s:Label id="lblLength" width="100%" textAlign="center" />
+		
+		<s:Rect width="100%" height="1" includeIn="portrait" >
+			<s:fill>
+				<s:SolidColor color="0xaaaaaa" />
+			</s:fill>
+		</s:Rect>
+	</s:VGroup>
+	<s:List id="lstLegs" itemRenderer="Renderer.legRenderer" 		
+			width="100%" height="100%"
+			dataProvider="{gVar.course.legs}"
+			change="lstLegs_changeHandler(event)"/>
+</s:View>

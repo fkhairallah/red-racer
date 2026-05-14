@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ViewNavigatorApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
+							xmlns:s="library://ns.adobe.com/flex/spark"
+							xmlns:Data="Model.Data.*"
+							xmlns:Model="Model.*"
+							xmlns:Course="Model.Course.*" 
+							xmlns:Components="Components.*"
+							applicationDPI="160"
+							resizeForSoftKeyboard="false"
+							firstView="views.HomeView"
+							initialize="app_initializeHandler(event)"
+							applicationComplete="contentCreationCompleteHandler(event)"
+							activate="activateHandler(event)"
+							deactivate="onDeactivate(event)"
+							splashScreenImage="@Embed('images/SplashScreen.png')"
+							splashScreenScaleMode="stretch" 
+							>
+	<fx:Style source="RegattaRacer.css"/>
+	<s:navigationContent>
+		<s:Button label="Back" click="{navigator.popView()}" color="black">
+			<s:icon>
+				<s:MultiDPIBitmapSource source160dpi="@Embed('images/LeftChevron160.png')"
+										source240dpi="@Embed('images/LeftChevron240.png')"
+										source320dpi="@Embed('images/LeftChevron320.png')"/>
+			</s:icon>
+		</s:Button>
+	</s:navigationContent>
+	<s:actionContent>
+		<s:Spacer width="5" />
+		<s:CalloutButton id="btnMenu" icon="{Icon_Repair}" color="black" height="34">
+			<s:calloutContent>
+				<s:VGroup width="200" gap="5" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5" horizontalAlign="center">
+					<s:Label text="Tools:" />
+					<s:Button label="Set Wind" width="80%" click="{navigator.pushView(WindDirection)}"
+							  visible="{gVar.vData.isStandaloneMode}"
+							  includeInLayout="{gVar.vData.isStandaloneMode}"/>
+					<s:Button label="Instruments" width="80%" click="{navigator.pushView(InstrumentView)}"
+							  enabled="{!(navigator.activeView is InstrumentView)}" />
+					<s:Button label="Locate Point" width="80%" click="{navigator.pushView(LocatePoint)}"
+							  enabled="{!(navigator.activeView is LocatePoint)}"/>
+					<s:Button label="Nav Segment" width="80%" click="{navigator.pushView(NavigateSegment)}"
+							  enabled="{!(navigator.activeView is NavigateSegment)}" />
+					<s:Button label="Stopwatch" width="80%" click="{navigator.pushView(StopWatch)}"
+							  enabled="{!(navigator.activeView is StopWatch)}"/>
+					<s:Group width="80%">
+						<s:Button width="40%" icon="{HelpIcon}" left="0" verticalCenter="0"
+								  click="{navigateToURL(new URLRequest('http://www.regattared.com/red-racer-help/'));}" />
+						<Components:SaildataSourceIndicator id="dSDSI" width="40%" height="{dSDSI.width}" right="0" verticalCenter="0"/>
+					</s:Group>
+					
+					<s:Button label="DEBUG" width="80%" click="{navigator.pushView(DebugView)}"
+							  visible="{debugMode}" includeInLayout="{debugMode}"/>
+					
+				</s:VGroup>
+			</s:calloutContent>
+		</s:CalloutButton>
+	</s:actionContent>
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import flash.net.navigateToURL;
+			
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			
+			import Land.ImportExport;
+			
+			import Model.Course.RaceCourse;
+			import Model.Data.SailPointEvent;
+			
+			import Tools.InstrumentView;
+			import Tools.LocatePoint;
+			import Tools.NavigateSegment;
+			import Tools.StopWatch;
+			import Tools.WindDirection;
+			
+			import icons.HelpIcon;
+			import icons.Icon_Repair;
+			
+			import views.DebugView;
+			import views.HomeView;
+			import views.StartupView;
+						
+			// the below flag is used to put the all in debug mode. 
+			// this should be turned off before release
+			[Bindable]public static var debugMode:Boolean = false;
+			
+			
+			protected function app_initializeHandler(event:FlexEvent):void
+			{
+				// when here  DO NOT allow phone to sleep
+				NativeApplication.nativeApplication.systemIdleMode = SystemIdleMode.KEEP_AWAKE;
+				
+				// capture the exit event
+				NativeApplication.nativeApplication.addEventListener(Event.EXITING, handleExitEvent);
+				
+				NativeApplication.nativeApplication.addEventListener(InvokeEvent.INVOKE, handleInvokeEvent);
+				
+				// initialize the distriqtANE(s)
+				
+//				ApplicationRater.init( distriqt_Key );
+//				ApplicationRater.service.setDaysUntilPrompt(15);
+//				ApplicationRater.service.setSignificantEventsUntilPrompt( 5 );
+//				ApplicationRater.service.setApplicationId("892581731", ApplicationRater.IMPLEMENTATION_IOS);
+//				ApplicationRater.service.setApplicationId("air.com.deligent.redracer", ApplicationRater.IMPLEMENTATION_ANDROID);
+				//ApplicationRater.service.debugMode = true;
+				
+				// initialize global variable pool
+				gVar.loadFromStorage(persistenceManager);	// load data from
+				gVar.numberOfRuns++;				// increments the number of runs
+				gVar.courseList = acCourseLayout;
+				
+				// start listening immediately
+				gVar.vData.startConnection();
+				
+				// now hook status display to the connection event
+				gVar.vData.addEventListener(SailPointEvent.CONNECTION,dSDSI.refresh);
+				
+				
+				
+				// cheat for now & load a whole mess of waypoints.
+				if ( debugMode && (gVar.waypoints.length < 2) )
+					gVar.waypoints.addAll(acWayPoints);
+				
+				// now get the app version and compare it to what's stored
+				// if they are different ==> show help screen & update stored version
+				var descriptor:XML = NativeApplication.nativeApplication.applicationDescriptor;
+				var ns:Namespace = descriptor.namespaceDeclarations()[0];
+				var dVersion:String = descriptor.ns::versionNumber; // display it at bottom of screen
+				if (gVar.appVersion != dVersion) // first run - show help				
+				{
+					gVar.appVersion = dVersion;
+					navigator.pushView(HomeView);
+					navigator.pushView(StartupView);
+				}
+				
+			}
+			
+			/**************************************************************************************
+			 * 
+			 * Once the app is completely created, set device orientation
+			 * 
+			 * Then -- see if we have an openUrl invole event (e.g. started with a file) and act on it
+			 * why? because if we act immediatly a view gets loaded before the rest of the app is inited
+			 * and it will lock up.
+			 * 
+			 * ************************************************************************************/
+			protected var myInvokeEvent:InvokeEvent;
+			protected var isInitialized:Boolean;
+			protected function contentCreationCompleteHandler(event:FlexEvent):void
+			{
+				stage.setAspectRatio( gVar.deviceOrientation );
+		
+				// if we have an openUrl invoke event act on it.
+				if(myInvokeEvent != null)navigator.pushView(ImportExport, myInvokeEvent);
+				
+				isInitialized = true;
+			}
+			
+			protected function handleInvokeEvent(event:InvokeEvent):void
+			{
+				if (event.reason == "openUrl") 
+					if (isInitialized) // if app is initialized --> handle it now.
+						navigator.pushView(ImportExport, event);
+					else // handle it later
+						myInvokeEvent = event;
+			}
+			
+			protected function handleExitEvent(event:Event):void
+			{
+				gVar.vData.removeEventListener(SailPointEvent.CONNECTION,dSDSI.refresh);
+			}
+			
+			protected function activateHandler(event:Event):void
+			{
+				gVar.vData.startConnection();
+			}
+			
+			protected function onDeactivate(event:Event):void
+			{
+				gVar.saveToStorage(persistenceManager);
+				gVar.vData.stopConnection();
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<s:ArrayCollection id="acCourseLayout">
+			<Course:CourseLayout source="images/courses/Custom-Course.jpg" 
+								 text="Custom Course" courseType="{RaceCourse.CT_CUSTOM}"
+								 description="Custom course with any number of marks and gates" /> 
+			<Course:CourseLayout text="Single Mark" courseType="{RaceCourse.CT_SINGLE}"
+								 description="Single mark. Adhoc navigation."/>
+			<Course:CourseLayout source="images/courses/Windward-Leeward.jpg" 
+								 text="Windward/leeward" courseType="{RaceCourse.CT_WINWAEDLEEWARD}"
+								 description="Traditional windward/leeward race with 2 marks."/> 
+			<Course:CourseLayout source="images/courses/Olympic.jpg" 
+								 text="Olympic/Reaching Leg" courseType="{RaceCourse.CT_TRIANGLE}"
+								 description="Triangular course with a reaching leg. Used in Olympics or team racing."/> 
+		</s:ArrayCollection>
+		
+		<s:ArrayCollection id="acWayPoints">	
+			<Data:GPSPoint name="New Haven" description="NH RW New Haven Whistle"  lat="41.20213" lon="-72.89633" />
+			<Data:GPSPoint name="Bridgeport" description="Bridgeport RW BH Mo(A) WHIS" lat="41.1040916666667" lon="-73.1952933333333" />
+			<Data:GPSPoint name="PnP" description="Point No Point R18" lat="41.113598333" lon="-73.135875000" />
+			<Data:GPSPoint name="Charles Red" description="Charles Island R16" lat="41.18427166666667" lon="-73.0519" />
+			<Data:GPSPoint name="Charles Green" description="Charles Island Green Can" lat="41.19372833" lon="-73.05088"/>
+			<Data:GPSPoint name="Housatonic" description="G1 Housatonic River Midchannel" lat="41.156825" lon="-73.090479"/>
+			<Data:GPSPoint name="Middle Ground" description="Middle Ground C3" lat="41.076585000" lon="-73.104241667" />
+			<Data:GPSPoint name="Windjammers" description="Windjammers Mark" lat="41.19085" lon="-73.0412" />
+			<Data:GPSPoint name="Milford Red" description="Red Bell Milford Harbor" lat="41.204361" lon="-73.049073"/>
+			<Data:GPSPoint name="Ponds Point" description="Ponds Point" lat="41.197927" lon="-73.016598"/>
+			<Data:GPSPoint name="Welches" description="Welches Point R'2'" lat="41.198668" lon="-73.036313"/>
+			
+			<Data:GPSPoint name="Stratford Light" description="Stratford Shoals Lighthouse" lat="41.05982" lon="-73.101355" />
+			<Data:GPSPoint name="Townshend Ledge" description="R &quot;10A&quot; Townshend Ledge" lat="41.20869" lon="-72.86315" />
+			<Data:GPSPoint name="Middle Ground" description="Middle Ground C1" lat="41.069763333" lon="-73.086523333" />
+			<Data:GPSPoint name="NH West" description="New Haven Breakwater West" lat="41.22557833" lon="72.95587" />
+			
+			
+			<Data:GPSPoint name="Star Center" description="Start Circle center 'S'" lat="41.18118" lon="-73.02625"/>
+			<Data:GPSPoint name="Star A" description="A Star Circle" lat="41.1638166666667" lon="-73.0158833333333" />
+			<Data:GPSPoint name="Star B" description="B Star Circle" lat="41.1631166666667" lon="-73.03415" />
+			<Data:GPSPoint name="Star C" description="C Star Circle" lat="41.1731" lon="-73.0487166666667" />
+			<Data:GPSPoint name="Star F" description="F Star Circle" lat="41.2043" lon="-73.0492" />
+			<Data:GPSPoint name="Star L" description="L Star Circle" lat="41.1891833333333" lon="-73.0022333333333" />
+			<Data:GPSPoint name="Star N" description="N Star Circle" lat="41.1745333333333" lon="-73.0018333333333" />
+			
+		</s:ArrayCollection>
+	</fx:Declarations>
+</s:ViewNavigatorApplication>

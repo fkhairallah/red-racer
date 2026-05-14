@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" title="Upgrade Needed">
+	<s:navigationContent>
+		<s:Image width="29" height="29" source="@Embed('images/IconHome.png')" />
+	</s:navigationContent>
+
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:Label x="65" y="144" width="350" height="145"
+			 text="This application has expired."/>
+	<s:Label x="65" y="85" color="#F32323" fontSize="35" text="Oops!"/>
+</s:View>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009"
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				width="100%"
+				gestureSwipe="itemSwiped(event)"
+				dataChange="dataChangeHandler(event)">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import Components.ListActionsEvent;
+			
+			import Model.Data.GPSPoint;
+
+			// This routine captures swipes and shows the DELETE button on LEFT swips
+			// it is activated by an entry in ItemRenderer header 
+			protected function itemSwiped(event:TransformGestureEvent):void
+			{
+				//trace(data.name, " Swiped ",event.offsetX==-1?"Left":"Right");
+				btnDelete.visible = (event.offsetX==-1);
+				btnDelete.includeInLayout = (event.offsetX==-1);
+			}
+			// This is needed because AIR recycles itemRenderers and just loads new data into them.
+			// so showing a delete button, will make it appear on mutliple entries in the list
+			// this function insures that when new data is loaded into the renderer we start from a
+			// delete button in hidden position
+			protected function dataChangeHandler(event:FlexEvent):void
+			{
+				btnDelete.visible = false;
+				btnDelete.includeInLayout = false;
+			}
+			
+			// This routine responds to the DELETE press by firing off a "DELETE" list event
+			// parent container's responsibility to respond to this event and do something
+			protected function btnDelete_clickHandler(event:MouseEvent):void
+			{
+				btnDelete.visible = false;
+				btnDelete.includeInLayout = false;
+				dispatchEvent(new ListActionsEvent(ListActionsEvent.DELETE,data));
+			}
+			
+			
+			protected function item_clickHandler(event:MouseEvent):void
+			{
+				if (btnDelete.visible)
+				{
+					btnDelete.visible = false;
+					btnDelete.includeInLayout = false;					
+				}
+				else
+				{
+					dispatchEvent(new ListActionsEvent(ListActionsEvent.SELECT,data));
+				}
+			}
+			
+			// display location and bearing of this waypoint from current location
+			// current location is globally supplied in gVar.vData.currentData
+			protected function getLocation(point:GPSPoint):String
+			{
+				// we have a valid lat/lon ==> calculate the location info
+				var distance:Number;
+				var bearing:int;
+				
+				// if we know where we are ==> show distance & bearing
+				if (gVar.vData.currentData.isValid && point.isValid)
+				{
+					distance = gVar.vData.currentData.distanceTo(data as GPSPoint);
+					bearing = gVar.vData.currentData.bearingTo(data as GPSPoint);
+					return gVar.distance.formatDistance(distance) + ", bearing " + gVar.bearing.formatBearing(bearing);
+				}
+				else
+				{
+					lblLocation.includeInLayout = false;
+					return "";
+				}
+			}
+			
+
+			
+		]]>
+	</fx:Script>
+	<s:VGroup width="100%" gap="5" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5"
+			  click="item_clickHandler(event)">
+		<s:Label width="100%" height="100%" fontSize="24" fontWeight="bold" color="{data.isValid?0x053ad3:0xff0000}"
+				 text="{data.name}" textAlign="left" verticalAlign="middle"/>
+		<s:Label width="100%" fontSize="14" text="{data.description}"/>
+		<s:Label id="lblLocation" width="100%" fontSize="14" fontWeight="bold" text="{getLocation(data as GPSPoint)}"/>
+	</s:VGroup>
+	<s:Button id="btnDelete" label="Delete" color="red" visible="false" includeInLayout="false" right="10" verticalCenter="0"
+			  click="btnDelete_clickHandler(event)"/>
+	<s:Rect width="100%" height="1" bottom="0" left="0">
+		<s:fill>
+			<s:SolidColor color="0xaaaaaa" />
+		</s:fill>
+	</s:Rect>
+
+</s:ItemRenderer>

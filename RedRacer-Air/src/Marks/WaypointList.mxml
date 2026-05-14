@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		initialize="initializeHandler(event)"
+		title="Waypoints" xmlns:Model="Model.*">
+	<s:layout>
+		<s:VerticalLayout paddingBottom="5"/>
+	</s:layout>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			
+			import Components.ListActionsEvent;
+			
+			import Land.ImportExport;
+			
+			import Model.Data.GPSPoint;
+			import Model.Data.GoFreeEvent;
+			
+			import icons.Icon_Upload;
+			
+			//protected var list:ArrayCollection;
+			protected function initializeHandler(event:FlexEvent):void
+			{
+				
+				lstWaypoints.addEventListener(ListActionsEvent.DELETE,deleteItem);
+				lstWaypoints.addEventListener(ListActionsEvent.SELECT,selectItem);
+				
+			}
+			
+			protected function btnNew_clickHandler(event:MouseEvent):void
+			{
+				navigator.pushView(Marks.WaypointEdit);
+			}
+			
+			protected function deleteItem(event:ListActionsEvent):void
+			{
+				if (lstWaypoints.selectedIndex != -1) {
+					lstWaypoints.dataProvider.removeItemAt(lstWaypoints.selectedIndex);
+				}
+			}
+			
+			// this routine is called whenever a waypoint is selected.
+			protected function selectItem(event:ListActionsEvent):void
+			{
+				if (lstWaypoints.selectedIndex != -1) {
+					navigator.pushView(Marks.WaypointEdit,lstWaypoints.selectedItem);
+				}
+			}
+			
+			protected function btnLoad_clickHandler(event:MouseEvent):void
+			{
+				navigator.pushView(ImportExport);
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		
+	</fx:Declarations>
+	<s:List id="lstWaypoints" width="100%" height="100%" enabled="true"
+			itemRenderer="Renderer.WaypointRenderer" dataProvider="{gVar.waypoints}"/>
+	<s:Rect width="100%" height="1" >
+		<s:fill>
+			<s:SolidColor color="0xaaaaaa" />
+		</s:fill>
+	</s:Rect>
+	<s:HGroup width="100%" horizontalAlign="center" verticalAlign="middle">
+		<s:Button id="btnNew" label="New" click="btnNew_clickHandler(event)" height="100%" />
+		<s:Button id="btnLoad" label="Export"  icon="{Icon_Upload}" 
+				  click="btnLoad_clickHandler(event)" enabled="true"/>
+	</s:HGroup>
+</s:View>

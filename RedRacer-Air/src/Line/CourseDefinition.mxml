@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		initialize="initializeHandler(event)"
+		viewActivate="viewActivateHandler(event)"
+		title="Set Course" xmlns:Components="Components.*">
+	<s:states>
+		<s:State name="portrait"/>
+		<s:State name="landscape"/>
+	</s:states>
+	<s:layout.landscape>
+		<s:HorizontalLayout paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5" />
+	</s:layout.landscape>
+	<s:layout.portrait>
+		<s:VerticalLayout  paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5" />
+	</s:layout.portrait>
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import spark.events.ViewNavigatorEvent;
+			
+			import Model.Course.RaceCourse;
+			
+			
+			
+			/**********************************************************************
+			 * This view has been simplified temporarily instead of removing all
+			 * complex course functionality we simply replaced it with two options:
+			 * - windward/leeward
+			 * - Custom
+			 * 
+			 * Code has been commented out for now.
+			 * *******************************************************************/
+			
+			protected function initializeHandler(event:FlexEvent):void
+			{
+
+				// windward/leeward course is code 2 and is the default
+				if (!isNaN(gVar.course.courseType) )
+					tsCourse.selected = (gVar.course.courseType == 2);
+				
+				//tiCourseDefinition.text = gVar.course.courseString;
+				
+				tsCourse_changeHandler();
+			}
+			
+			protected function viewActivateHandler(event:ViewNavigatorEvent):void
+			{
+				
+			}
+			
+			
+			protected function courseDefinitionEnter():void
+			{
+				tiCourseDefinition.text = tiCourseDefinition.text.toUpperCase().replace(/\s+/g,'');
+				tiRepeatCount.setFocus();
+				tiRepeatCount.selectAll();					
+			}
+			protected function repeatCountEnter():void
+			{
+				btnNext.setFocus();
+			}
+			
+			// save course information & pop view
+			protected function btnNext_clickHandler(event:MouseEvent):void
+			{
+				
+				// if custom course ==> validate codes
+				//if (lstCourseLayout.selectedItem.courseType == 0)
+				if (!tsCourse.selected)
+				{
+					courseDefinitionEnter();
+					if (tiCourseDefinition.text.length == 0) 
+					{
+						tiCourseDefinition.setStyle("contentBackgroundColor","red"); 
+						return;	// need data
+					}
+				}
+				
+				// update the # of times
+				gVar.course.repeat = parseInt(tiRepeatCount.text);					
+				
+				var thisCourseType:int = (tsCourse.selected?RaceCourse.CT_WINWAEDLEEWARD:RaceCourse.CT_CUSTOM);
+				
+				if ( 
+					(gVar.course.courseType != thisCourseType) ||
+					((gVar.course.courseType == RaceCourse.CT_CUSTOM) && (gVar.course.courseString != tiCourseDefinition.text) ) )
+				{
+					gVar.course.courseType = thisCourseType;			// set course type
+					gVar.course.courseString = tiCourseDefinition.text;	// & course String as announced by RC
+					gVar.course.generateCourse(gVar.marks);				// generate course data using existing marks
+					
+					// wipe RC/Pin info -- unless the user wants to keep 
+					if (!cbKeepRC.selected) // default -> wipe
+					{
+						gVar.course.rcBoat.lat = Number.NaN;
+						gVar.course.rcBoat.lon = Number.NaN;
+						gVar.course.pinMark.lat = Number.NaN;
+						gVar.course.pinMark.lon = Number.NaN;
+					}
+				}
+				
+				navigator.replaceView(CourseListOfMarks);// go to marks' view
+				
+				
+			}
+			
+			
+			protected function tsCourse_changeHandler(event:Event=null):void
+			{
+				lblCourse.text = gVar.courseList.getItemAt(tsCourse.selected?RaceCourse.CT_WINWAEDLEEWARD:RaceCourse.CT_CUSTOM).description;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		
+	</fx:Declarations>
+	<s:VGroup id="grpSelector" horizontalAlign="center" 
+			  width.landscape="50%" height.landscape="100%"
+			 width.portrait="100%" height.portrait="50%">
+		<Components:CustomSlideSwitch id="tsCourse" selected="true"
+			skinClass="Skins.ToggleSwitchSkin" fontSize="24"
+ 			selectedLabel="Windward/Leeward" deselectedLabel="Other"
+			change="tsCourse_changeHandler(event)"/>
+		<s:HGroup id="gCustom" width="100%" verticalAlign="middle" visible="{!tsCourse.selected}">
+			<s:Label text="Course:" fontSize="24" />	
+			<s:TextInput id="tiCourseDefinition" width="75%" fontSize="36"
+						 autoCapitalize="all" autoCorrect="false"
+						 prompt="Course" typographicCase="uppercase"
+						 text="{gVar.course.courseString}"
+						 enter="{courseDefinitionEnter();}"/>
+		</s:HGroup>
+		
+		<s:HGroup width="100%" verticalAlign="middle">
+			<s:Label text="Number of Circuits:" fontSize="20" />
+			<s:TextInput id="tiRepeatCount" width="20%" fontSize="36" prompt="X" 
+						 softKeyboardType="number" enter="{repeatCountEnter()}"
+						 text="{gVar.course.repeat}"
+						 restrict="0-9" textAlign="center"/>
+		</s:HGroup>
+		<s:CheckBox id="cbKeepRC" label="Keep RC/Pin locations" selected="false"
+					visible="{gVar.course.rcBoat.isValid}"/>
+		<s:Button id="btnNext" label="Next &gt;&gt;" 
+				  click="btnNext_clickHandler(event)"/>
+
+	</s:VGroup>
+	
+	<s:VGroup  width.landscape="50%" height.landscape="100%" gap.landscape="10"
+			   width.portrait="100%" height.portrait="50%" horizontalAlign="center"
+			   paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10">
+		<s:Label id="lblCourse" width="100%" height="100%" fontSize="28" textAlign="center" fontStyle="italic" />
+		
+	</s:VGroup>
+	
+	
+</s:View>

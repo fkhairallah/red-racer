@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009"
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		xmlns:mx="library://ns.adobe.com/flex/mx"
+		title="Performance"
+		initialize="view1_initializeHandler(event)">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			
+			import spark.collections.Sort;
+			import spark.collections.SortField;
+			
+			import Components.ListActionsEvent;
+			
+			import digitalretro.components.MessageBox;
+			import digitalretro.events.MessageBoxEvent;
+			
+			protected function view1_initializeHandler(event:FlexEvent):void
+			{
+				if (gVar.vessel.polars != null)
+				{
+					for each (var o:Object in gVar.performance) {
+						o.percentOfTarget = 100 * o.speedOverGround / gVar.vessel.polars.getTarget(o.trueWindSpeed, o.trueWindAngle).v;
+					}
+				}
+				
+				var sortName:SortField = new SortField();
+				sortName.name = "name";
+				sortName.numeric = false;
+				
+				var sortTWS:SortField = new SortField();
+				sortTWS.name = "apparentWindSpeed";
+				sortTWS.numeric = true;
+				
+				var sortTWA:SortField = new SortField();
+				sortTWA.name = "apparentWindAngle";
+				sortTWA.numeric = true;
+				var numericDataSort:Sort = new Sort();
+				numericDataSort.fields = [sortName, sortTWS, sortTWA];
+				gVar.performance.sort = numericDataSort;
+				gVar.performance.refresh();
+				
+				lstPoints.addEventListener(ListActionsEvent.DELETE,deleteItem);
+				lstPoints.addEventListener(ListActionsEvent.SELECT,selectItem);
+				
+			}
+			
+			
+			
+			// this routine will send a "polars" command to the Analytics
+			// which will respond by downloading the current polars into the app
+			protected function btnLoad_clickHandler(event:MouseEvent):void
+			{
+			}
+			
+			protected function deleteItem(event:ListActionsEvent):void
+			{
+				if (lstPoints.selectedIndex != -1) {
+					lstPoints.dataProvider.removeItemAt(lstPoints.selectedIndex);
+				}
+			}
+			
+			
+			
+			protected function selectItem(event:ListActionsEvent):void
+			{
+				if (lstPoints.selectedItem != null) navigator.pushView(PerformanceGetNew, lstPoints.selectedItem);
+			}
+			
+			/**************************************************************************
+			 * These routines handle the DELETE ALL functionality
+			 * ***********************************************************************/
+			protected function btnDeleteAll_clickHandler(event:MouseEvent):void
+			{
+				
+				var msgBox:MessageBox = MessageBox.show(navigator.activeView, 
+					MessageBox.MB_YESNO, MessageBox.IC_ALERT, 
+					"Delete ALL", "All data will be deleted. Are you sure you want to delete all?");
+				
+				msgBox.addEventListener(MessageBoxEvent.MESSAGEBOX_YES, msgBox_onYes);
+				msgBox.addEventListener(MessageBoxEvent.MESSAGEBOX_NO, msgBox_onNo);
+			}
+			private function msgBox_onYes(event:MessageBoxEvent):void
+			{
+				var msgBox:MessageBox = event.target as MessageBox;
+				msgBox.removeEventListener(MessageBoxEvent.MESSAGEBOX_YES, msgBox_onYes);
+				msgBox.removeEventListener(MessageBoxEvent.MESSAGEBOX_NO, msgBox_onNo);
+				
+				gVar.performance = new ArrayCollection();
+				
+			}
+			private function msgBox_onNo(event:MessageBoxEvent):void
+			{
+				var msgBox:MessageBox = event.target as MessageBox;
+				msgBox.removeEventListener(MessageBoxEvent.MESSAGEBOX_YES, msgBox_onYes);
+				msgBox.removeEventListener(MessageBoxEvent.MESSAGEBOX_NO, msgBox_onNo);
+			}
+			
+			
+		]]>
+	</fx:Script>
+	
+	<s:layout>
+		<s:VerticalLayout paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5"/>
+	</s:layout>
+	<s:HGroup width="100%">
+		<s:Button id="btnDeleteAll" label="Delete All" click="btnDeleteAll_clickHandler(event)" />
+		<s:Label id="lblStatus" width="100%" height="100%" textAlign="left" verticalAlign="middle"/>
+		<s:Button id="btnNew" label="+" click="{navigator.pushView(PerformanceGetNew)}" />
+	</s:HGroup>
+	<s:List id="lstPoints" width="100%" height="100%" horizontalScrollPolicy="off"
+			dataProvider="{gVar.performance}"
+			itemRenderer="Renderer.PerformancePointRenderer"/>
+	
+	
+	
+</s:View>

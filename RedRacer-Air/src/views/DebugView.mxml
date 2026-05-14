@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		xmlns:Components="Components.*"
+		title="DebugView"
+		initialize="initializeHandler(event)"
+		viewActivate="viewActivateHandler(event)"
+		viewDeactivate="viewDeactivateHandler(event)">
+	<s:layout>
+		<s:VerticalLayout gap="5"/>
+	</s:layout>
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import spark.events.ViewNavigatorEvent;
+			
+			import Model.Data.GPSPoint;
+			import Model.Data.SailPointEvent;
+			
+			[Bindable]protected var inSequence:Boolean;
+			
+			protected function initializeHandler(event:FlexEvent):void
+			{
+				// TODO Auto-generated method stub
+				inSequence = false;
+				
+			}
+			
+			protected function viewActivateHandler(event:ViewNavigatorEvent):void
+			{
+				if (!gVar.vData.isConnected) { // start tracking @250ms intervals
+					gVar.vData.startConnection();
+				}
+				
+				//gVar.masterC.setStartMode();
+				
+				gVar.vData.addEventListener(SailPointEvent.CONNECTION,connectionUpdate);
+				gVar.vData.addEventListener(SailPointEvent.NEW_SAILPOINT,connectionUpdate);
+				
+			}
+			
+			protected function viewDeactivateHandler(event:ViewNavigatorEvent):void
+			{
+				//gVar.masterC.setIdleMode();
+				gVar.vData.removeEventListener(SailPointEvent.CONNECTION,connectionUpdate);
+				gVar.vData.removeEventListener(SailPointEvent.NEW_SAILPOINT,connectionUpdate);
+			}
+			
+			protected function connectionUpdate(event:SailPointEvent):void				
+			{
+				if (gVar.vData.isStandaloneMode)
+					lblGPSAccuracy.text="GPS Accuracy " + gVar.vData.gpsData.horizontalAccuracy.toFixed(1) 
+						+ "m each " +gVar.vData.gpsData.updateInterval.toFixed(0)+ "ms";
+				
+			}
+			
+			
+			
+			protected function debug_clickHandler(event:MouseEvent):void
+			{
+				gVar.course.rcBoat.lat = 41.186413;
+				gVar.course.rcBoat.lon = -73.037903;
+
+				gVar.course.pinMark.lat = 41.188908;
+				gVar.course.pinMark.lon = -73.039202;
+				
+				lblGPSAccuracy.text = "PIN & RC set to LAST CHANCE";
+				return;
+				
+				var b:GPSPoint = new GPSPoint;
+				b = gVar.course.rcBoat.movePoint(0.06,270);
+				gVar.vData.currentData.lat = b.lat;
+				gVar.vData.currentData.lon = b.lon;
+				
+				gVar.vData.currentData.trueWindDirection = 90;
+				gVar.vData.currentData.trueWindSpeed = 8;
+				gVar.vData.currentData.trueHeading = 60;
+				gVar.vData.currentData.calculateApparentWindFromTrue();
+				
+				//startLine.validLine = gVar.course.isStartLineValid;
+				//trace(startLine.validLine, gVar.masterC.OCS);
+
+				
+				// pass -1 until the timer starts
+				gVar.masterC.updateStartStatus(-1);
+				//startLine.update(gVar.masterC);
+				
+				
+			}
+			
+			protected function startTimer(event:Event):void
+			{
+				gVar.masterC.updateStartStatus(100);
+//				startLine.start();
+			}
+			protected function updateTimer(event:Event):void
+			{
+				//startLine.update(gVar.masterC);
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:Label id="lblGPSAccuracy" width="100%" fontSize="18" textAlign="center" verticalAlign="middle"/>
+	
+	<s:Button label="Load Last chance start line" click="debug_clickHandler(event)"/>
+	<s:Button label="Start" click="startTimer(event)" />
+	<s:Button label="updateTimer" click="updateTimer(event)" />
+
+	
+</s:View>

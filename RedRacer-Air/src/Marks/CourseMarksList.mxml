@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		initialize="initializeHandler(event)"
+		title="Course Marks" xmlns:Model="Model.*">
+	<s:layout>
+		<s:VerticalLayout paddingBottom="5"/>
+	</s:layout>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			
+			import Components.ListActionsEvent;
+			
+			import Land.ImportExport;
+			
+			import Model.Course.CourseMark;
+			import Model.Data.GoFreeEvent;
+			
+			import digitalretro.components.MessageBox;
+			import digitalretro.events.MessageBoxEvent;
+			
+			import icons.Icon_Upload;
+			
+			protected function initializeHandler(event:FlexEvent):void
+			{
+				lstMarks.addEventListener(ListActionsEvent.DELETE,deleteItem);
+				lstMarks.addEventListener(ListActionsEvent.SELECT,selectItem);
+				
+			}
+			
+			protected function btnNew_clickHandler(event:MouseEvent):void
+			{
+				navigator.pushView(Marks.CourseMarkEdit);
+			}
+			
+			
+			
+			protected function deleteItem(event:ListActionsEvent):void
+			{
+				if (lstMarks.selectedIndex != -1) {
+					lstMarks.dataProvider.removeItemAt(lstMarks.selectedIndex);
+				}
+			}
+			
+			// this routine is called whenever a waypoint is selected.
+			protected function selectItem(event:ListActionsEvent):void
+			{
+				if (lstMarks.selectedIndex == -1) return;
+				
+				navigator.pushView(Marks.CourseMarkEdit,lstMarks.selectedItem);
+			}
+			
+			protected function btnLoad_clickHandler(event:MouseEvent):void
+			{
+				navigator.pushView(ImportExport);
+			}
+			
+			protected function btnDeleteAll_clickHandler(event:MouseEvent):void
+			{
+				var msgBox:MessageBox = MessageBox.show(navigator.activeView, 
+					MessageBox.MB_YESNO, MessageBox.IC_DELETE, 
+					"Delete Marks", "Do you want to delete all marks?");
+				
+				msgBox.addEventListener(MessageBoxEvent.MESSAGEBOX_YES, msgBox_onYes);
+				msgBox.addEventListener(MessageBoxEvent.MESSAGEBOX_NO, msgBox_onNo);
+			}
+			private function msgBox_onYes(event:MessageBoxEvent):void
+			{
+				var msgBox:MessageBox = event.target as MessageBox;
+				msgBox.removeEventListener(MessageBoxEvent.MESSAGEBOX_YES, msgBox_onYes);
+				msgBox.removeEventListener(MessageBoxEvent.MESSAGEBOX_NO, msgBox_onNo);
+				
+				gVar.marks = new ArrayCollection();
+				
+			}
+			private function msgBox_onNo(event:MessageBoxEvent):void
+			{
+				var msgBox:MessageBox = event.target as MessageBox;
+				msgBox.removeEventListener(MessageBoxEvent.MESSAGEBOX_YES, msgBox_onYes);
+				msgBox.removeEventListener(MessageBoxEvent.MESSAGEBOX_NO, msgBox_onNo);
+			}
+			
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:List id="lstMarks" width="100%" height="100%" enabled="true"
+			itemRenderer="Renderer.CourseMarkRenderer" dataProvider="{gVar.marks}"/>
+	<s:Rect width="100%" height="1" >
+		<s:fill>
+			<s:SolidColor color="0xaaaaaa" />
+		</s:fill>
+	</s:Rect>
+	<s:HGroup width="100%" horizontalAlign="center" verticalAlign="middle">
+		<s:Button id="btnNew" label="New" click="btnNew_clickHandler(event)" height="100%"/>
+		<s:Button id="btnAllDelete" label="Del All" click="btnDeleteAll_clickHandler(event)" height="100%"/>
+		<s:Button id="btnLoad" label="Export"  icon="{Icon_Upload}" 
+				  click="btnLoad_clickHandler(event)" enabled="true"/>
+	</s:HGroup>
+</s:View>

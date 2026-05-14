@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Graphic version="1.0" viewHeight="60" viewWidth="60" xmlns="http://ns.adobe.com/fxg/2008">
+  <Library/>
+  <Group x="5.63086" y="5.57812" d:type="layer" d:userLabel="Layer 1" xmlns:d="http://ns.adobe.com/fxg/2008/dt">
+    <Ellipse x="0.5" y="0.5" width="49.4297" height="49.4297">
+      <fill>
+        <SolidColor color="#109106"/>
+      </fill>
+      <stroke>
+        <SolidColorStroke caps="none" weight="1" joints="miter" miterLimit="4"/>
+      </stroke>
+    </Ellipse>
+    <Ellipse x="6.68066" y="6.68066" width="37.0684" height="37.0684">
+      <fill>
+        <SolidColor color="#109106"/>
+      </fill>
+      <stroke>
+        <SolidColorStroke caps="none" weight="1" joints="miter" miterLimit="4"/>
+      </stroke>
+    </Ellipse>
+    <Ellipse x="14.9502" y="14.9502" width="20.5293" height="20.5293">
+      <fill>
+        <SolidColor color="#109106"/>
+      </fill>
+      <stroke>
+        <SolidColorStroke caps="none" weight="1" joints="miter" miterLimit="4"/>
+      </stroke>
+    </Ellipse>
+  </Group>
+</Graphic>

@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		xmlns:Components="Components.*"
+		initialize="initializeHandler(event)"
+		viewActivate="viewActivateHandler(event)"
+		viewDeactivate="viewDeactivateHandler(event)" xmlns:Renderer="Renderer.*">
+	
+	<s:states>
+		<s:State name="portrait"/>
+		<s:State name="landscape"/>
+	</s:states>
+	<s:layout.landscape>
+		<s:HorizontalLayout paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5" />
+	</s:layout.landscape>
+	<s:layout.portrait>
+		<s:VerticalLayout  paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5" />
+	</s:layout.portrait>
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import com.distriqt.extension.compass.events.CompassEvent;
+			
+			import mx.core.FlexGlobals;
+			import mx.events.FlexEvent;
+			
+			import spark.events.ViewNavigatorEvent;
+			
+			import Chart.CourseChart;
+			
+			import Line.CourseDefinition;
+			import Line.CourseListOfMarks;
+			
+			import Marks.CourseMarkEdit;
+			
+			import Model.Course.CourseLeg;
+			import Model.Course.CourseMark;
+			import Model.Data.SailPointEvent;
+			
+			import Race.FinishRace;
+			
+			import Tools.NavigateSegment;
+			
+			import Utilities.Angles;
+			
+			import images.Icon_map35;
+			
+			protected var nextMarkBearing:Number;
+			protected var nextMarkDistance:Number;
+			
+			protected function initializeHandler(event:FlexEvent):void
+			{
+				title = gVar.course.courseString + " x " + gVar.course.repeat.toString();
+				
+				if (isNaN(gVar.course.courseType)) // we do not have a course yet
+				{
+					navigator.replaceView(CourseDefinition);
+					return;
+				}
+				
+				updateNextMarkData();		// update data for next mark
+			}
+			
+			protected function viewActivateHandler(event:ViewNavigatorEvent):void
+			{
+				
+				gVar.vData.addEventListener(SailPointEvent.NEW_SAILPOINT,handleNewSailpointData);
+				
+				
+				// start tracking compass and vibrate when pointed to the mark
+				gVar.compass.listen(updateHeading);
+				cpNextMark.enabled = true;
+				
+				
+			}
+			protected function viewDeactivateHandler(event:Event):void
+			{
+				
+				gVar.vData.removeEventListener(SailPointEvent.NEW_SAILPOINT,handleNewSailpointData);
+				gVar.compass.unlisten(updateHeading);
+				
+			}
+			protected function handleNewSailpointData(event:SailPointEvent):void
+			{
+				
+				// update next mark info, if we have one
+				var mark:CourseMark = gVar.course.nextMark;
+				if (mark.isValid) {
+					nextMarkBearing = gVar.vData.currentData.bearingTo(mark);
+					nextMarkDistance = gVar.vData.currentData.distanceTo(mark)
+					dgBearing.value = nextMarkBearing;
+					dgDistance.value = nextMarkDistance;
+				}
+				else
+				{
+					dgDistance.value = Number.NaN;
+					dgBearing.value = Number.NaN;
+				}
+				
+				if (!isNaN(gVar.vData.currentData.speedOverGround))
+				{
+					//var distance:Number;
+					//var bearingToPoint:Number;
+					var vmg:Number;
+					vmg = gVar.vData.currentData.speedOverGround * 
+						Math.cos(Angles.degreeToRad(
+							Angles.substractAngles(nextMarkBearing, gVar.vData.currentData.courseOverGround)
+						));
+					dgVMG.value = vmg;
+					var eta:Number;
+					eta = nextMarkDistance/vmg;
+					
+					if (eta < 0) dgETA.value = "N/A"; // negative VMC ==> No ETA
+					else
+						if (eta < 1) // less than 1 hour --> display minutes
+							dgETA.value = (eta*60).toFixed(1) + "min";
+						else // more than 1 hour --> display hh:mm
+							dgETA.value = int(eta) + ":" + int((eta - int(eta))*60);
+				}
+				
+				// update list of maneuvers
+				gVar.course.updateLegs(gVar.vData.currentData.trueWindDirection);
+				
+			}
+			
+			
+			protected function updateHeading(event:CompassEvent):void
+			{
+				if (Math.abs(nextMarkBearing - event.trueHeading) < 3)
+				{
+					gVar.vibrate.vibrate();
+					grpMark.setStyle("backgroundColor", "0xFFAAAA");
+				}
+				else
+				{
+					grpMark.setStyle("backgroundColor", "0xFFFFFF");
+				}
+				
+				cpNextMark.refresh(gVar.bearing.getMagneticFromTrue(event.trueHeading),
+					gVar.bearing.getMagneticFromTrue(nextMarkBearing));
+			}
+			
+			protected function btnPrevious_clickHandler(event:MouseEvent):void
+			{
+				gVar.course.returnToPreviousLeg();
+				updateNextMarkData();
+			}
+			
+			protected function btnNext_clickHandler(event:MouseEvent):void
+			{
+				gVar.course.advanceToNextLeg();
+				updateNextMarkData();
+			}
+			
+			protected function updateNextMarkData():void
+			{
+				lblNextMark.text = gVar.course.nextMark.name;
+				
+				// now get next leg of the race
+				var nextLeg:CourseLeg = gVar.course.nextLeg;
+				if (nextLeg.isValid)
+				{
+					panelNextLeg.title = "Following Mark is " + nextLeg.endMark.name;
+					
+					// get the wind angle relative to the leg bearing
+					var a:Number = nextLeg.calculateWind(gVar.vData.currentData.trueWindDirection);
+					var minA:Number = nextLeg.calculateWind(gVar.masterC.raTWD.minValue);
+					var maxA:Number = nextLeg.calculateWind(gVar.masterC.raTWD.minValue);
+					
+				}
+				
+				lrNextLeg.data = nextLeg;
+				gVar.course.updateLegs(gVar.vData.currentData.trueWindDirection);
+			}
+			
+			// when the mark is touched and it's not valid ==> go to edit.
+			protected function lblNextMark_clickHandler(event:MouseEvent):void
+			{
+				if (!gVar.course.nextMark.isValid) 
+				{
+					navigator.pushView(CourseMarkEdit,gVar.course.nextMark);
+				}
+			}
+			
+			protected function lrNextLeg_clickHandler(event:MouseEvent):void
+			{
+				if (gVar.course.nextLeg.isValid)
+				{
+					navigator.pushView(NavigateSegment, gVar.course.nextLeg);
+				}
+				else
+				{
+					navigator.pushView(CourseListOfMarks);
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<s:DateTimeFormatter id="dateFormatter" dateTimePattern="k:mm:ss" />
+	</fx:Declarations>
+	
+	<s:VGroup horizontalAlign="center" gap="0"
+			  width.portrait="100%" width.landscape="50%"
+			  height.portrait="50%" height.landscape="100%">
+		
+		<Components:HContainer width="100%" height="55">
+			<s:Button id="btnPrevious" label="&lt;Prev" height="35" click="btnPrevious_clickHandler(event)" />
+			<s:Label id="lblNextMark" width="100%" height="100%" fontSize="22"
+					 text="{gVar.course.nextMark.name}" textAlign="center" verticalAlign="middle"
+					 color="{gVar.course.nextMark.isValid?0x053ad3:0xff0000}"
+					 click="lblNextMark_clickHandler(event)"/>
+			<s:Button id="btnNext" label="Next>" height="35" click="btnNext_clickHandler(event)" />
+		</Components:HContainer>
+		
+		<s:HGroup width="100%" height="100%">
+			<Components:CompassPointer id="cpNextMark" width="150" enabled="false"/>
+			<s:VGroup id="grpMark" width="100%" height="150" verticalAlign="middle"> 
+				<Components:dGaugeAngle id="dgBearing" bearing="{gVar.bearing}" label="Bearing" width="100%" />
+				<Components:dGaugeDistance id="dgDistance" distance="{gVar.distance}" label="Distance" width="100%"/>
+			</s:VGroup>
+		</s:HGroup>
+	</s:VGroup>
+	<s:Rect width="1" height="90%" includeIn="landscape">
+		<s:fill>
+			<s:SolidColor color="#AAA7A7" />
+		</s:fill>
+	</s:Rect>
+	<s:VGroup horizontalAlign="center" gap="5"
+			  width.portrait="100%" width.landscape="50%"
+			  height.portrait="50%" height.landscape="100%">
+		
+		<s:HGroup width="100%">
+			<Components:dGaugeNumeric id="dgVMG" precision="1" label="VMG" width="100%"/>
+			<Components:dGauge id="dgETA" label="ETA" width="100%"/>
+		</s:HGroup>
+		<s:Panel id="panelNextLeg" width="100%">
+			<s:layout>
+				<s:VerticalLayout horizontalAlign="center" />
+			</s:layout>
+			<Renderer:legRenderer id="lrNextLeg" click="lrNextLeg_clickHandler(event)" />
+			<s:Button label="More..." click="{FlexGlobals.topLevelApplication.viewMenuOpen=true}" />
+		</s:Panel>
+	</s:VGroup>
+	
+	<s:viewMenuItems>
+		<s:ViewMenuItem label="Chart" icon="{images.Icon_map35}"
+						click="{navigator.pushView(CourseChart)}"/>
+		<s:ViewMenuItem label="Course Details"  
+						click="{navigator.pushView(CourseDetails)}" />
+		<s:ViewMenuItem label="Change Course"  
+						click="{navigator.pushView(CourseDefinition)}" />
+		<s:ViewMenuItem label="Wind" enabled="{!gVar.vData.isStandaloneMode}"
+						click="{navigator.pushView(WindView)}" />
+		<s:ViewMenuItem label="Polars" enabled="{!gVar.vData.isStandaloneMode}"
+						click="{navigator.pushView(PolarTargetView)}" />
+		<s:ViewMenuItem label="Layline" enabled="false"
+						click="{navigator.pushView(LaylineView)}" />
+		<s:ViewMenuItem label="Finish Line"
+						click="{navigator.pushView(FinishRace)}" />
+	</s:viewMenuItems>
+	
+</s:View>

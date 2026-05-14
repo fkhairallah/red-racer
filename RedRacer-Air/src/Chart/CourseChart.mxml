@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		viewActivate="viewActivateHandler(event)"
+		title="Course Chart" xmlns:mx="library://ns.adobe.com/flex/mx">
+	<fx:Script>
+		<![CDATA[
+			import spark.events.ViewNavigatorEvent;
+			
+			import Model.Course.CourseMark;
+			import Model.Data.GPSPoint;
+			
+			
+			
+			
+			protected function viewActivateHandler(event:ViewNavigatorEvent):void
+			{				
+				gVar.chart.setSize(width,height);
+				if (!uicMapContainer.getChildByName("myChart")) {
+					uicMapContainer.addChild(gVar.chart.map);
+					gVar.chart.clearMap();
+					loadMapMarkers();
+				}
+			}
+			
+			/*
+			event handler called when the view is deactivated
+			*/
+			private function onViewDeactivate():void {
+				//hide the map's infowindow
+				gVar.chart.map.infoWindow.hide();
+			}
+			
+			
+			
+			
+			protected function loadMapMarkers():void
+			{
+				
+				gVar.chart.addRC(gVar.course.rcBoat);
+				for each (var p:CourseMark in gVar.course.marks)
+				{
+					gVar.chart.addMark(p);
+				}
+								
+				gVar.chart.drawCourse(gVar.vData.currentData);
+			}
+			
+			
+			
+		]]>
+	</fx:Script>
+	<mx:UIComponent id="uicMapContainer" width="100%" height="100%" x="0" y="0"/>
+	
+</s:View>

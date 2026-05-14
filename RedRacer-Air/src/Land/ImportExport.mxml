@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		title="Import/Export"
+		initialize="initializeHandler(event)" xmlns:Components="Components.*">
+	<s:states>
+		<s:State name="portrait"/>
+		<s:State name="landscape"/>
+	</s:states>
+	<s:layout>
+		<s:VerticalLayout paddingBottom="2" paddingLeft="2" paddingRight="2" paddingTop="2"  />
+	</s:layout>
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import flash.net.navigateToURL;
+			
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			import mx.events.ValidationResultEvent;
+			import mx.rpc.CallResponder;
+			import mx.rpc.events.ResultEvent;
+			import mx.validators.EmailValidator;
+			
+			import Model.Course.CourseMark;
+			import Model.Data.GPSPoint;
+			import Model.Data.GPX;
+			import Model.Data.GoFreeEvent;
+			
+			import images.Icon_Help;
+			
+			import services.redracerws.RedRacerWS;
+			
+			import valueObjects.WSResponse;
+			
+			protected function initializeHandler(event:FlexEvent):void
+			{
+				if (data != null)
+				{
+					var importEvent:InvokeEvent = data as InvokeEvent;						
+					if (importEvent.reason == "openUrl") processOpenURL(importEvent);
+				}
+				
+				
+			}
+			
+			/*************************************************************************************************
+			 *
+			 * These routine handle the invokeEvent where a GPX file is passed to the app 
+			 * 
+			 * **********************************************************************************************/
+			private var waypoints:ArrayCollection = new ArrayCollection;
+			private var marks:ArrayCollection = new ArrayCollection;
+			[Bindable]protected var gpxDetails:String;
+			
+			protected function processOpenURL(event:InvokeEvent):void
+			{
+				try
+				{
+					var file:File = new File;				
+					file.url = event.arguments[0];				// point to the URL
+					if (file.exists)		// if we have a file --> process it
+					{
+						var xmlLoader:URLLoader = new URLLoader();
+						xmlLoader.addEventListener(Event.COMPLETE, clubLoadGPXFileLoaded);
+						xmlLoader.load(new URLRequest(event.arguments[0]));
+					}
+					else
+					{
+					}
+				}
+				catch (e:Error)
+				{
+					trace (e.toString());
+				}
+				
+			}
+			
+			protected function clubLoadGPXFileLoaded(e:Event):void 
+			{
+				// load the data -- but first define the namespace
+				var fxml:XML = new XML(e.target.data);
+				GPX.loadFromXML(fxml, waypoints, marks);
+				
+				gpxDetails = waypoints.length + " waypoints & " + marks.length + " marks";
+				
+				// all's well --> display dialogue asking for acceptance
+				coOpenURL.open(this,true);
+				
+				
+				
+			}
+			protected function addToExisting_clickHandler(event:MouseEvent):void
+			{
+				gVar.waypoints.addAll(waypoints);
+				gVar.marks.addAll(marks);
+				coOpenURL.close();
+				navigator.popView();
+			}
+			protected function replaceExisting_clickHandler(event:MouseEvent):void
+			{
+				gVar.waypoints = waypoints;
+				gVar.marks = marks;
+				coOpenURL.close();
+				navigator.popView();				
+			}
+			
+			
+			
+			/*************************************************************************************************
+			 *
+			 * Send via email 
+			 * 
+			 * **********************************************************************************************/
+			
+			protected var sendWebService:CallResponder;
+			protected function btnEmail_clickHandler(event:MouseEvent):void
+			{
+				// create email validator
+				var ev:EmailValidator = new EmailValidator;
+				ev.listener = tiEmail;
+				var evr:ValidationResultEvent = ev.validate(tiEmail.text);
+				if ( (tiEmail.text == "") || (evr.type == ValidationResultEvent.INVALID)) {
+					tiEmail.setStyle("contentBackgroundColor", "0xFFAAAA");
+					return;
+				}
+				
+				
+				tiEmail.setStyle("contentBackgroundColor", "0xffffff");
+				
+				var email:String = tiEmail.text.toLowerCase(); // insure email is lower case
+				
+				// create XML string within CDATA block
+				var gpx:String = "<![CDATA[" + GPX.saveToXML(gVar.waypoints, gVar.marks) + "]]" + ">";
+				var jsWaypoints:String = JSON.stringify(gVar.waypoints);
+				
+				// send Data to Server
+				sendWebService = new CallResponder;
+				sendWebService.token = (new RedRacerWS).emailGPX(
+					42,
+					"com.deligent.redracer",
+					tiEmail.text,
+					gpx);
+				sendWebService.addEventListener(ResultEvent.RESULT,emailGPXResults);
+				
+				// Turn the spinner on
+				lblError.text = "Sending...";
+				BusyIndicator.visible = true;
+				btnEmail.enabled = false;
+				
+			}
+			
+			
+			private function emailGPXResults(event:ResultEvent):void
+			{
+				BusyIndicator.visible = false;
+				btnEmail.enabled = true;
+				
+				var result:WSResponse = sendWebService.lastResult;
+				
+				if (result.valid)
+					navigator.popToFirstView();	// done
+				else
+					lblError.text = result.message;
+				
+			}
+			
+			
+			/*************************************************************************************************
+			 * 
+			 * [Red] Analytics
+			 * 
+			 * **********************************************************************************************/
+			protected function goFreeLoad():void
+			{
+				if (gVar.vData.goFree.isRed)
+				{
+					gVar.vData.goFree.addEventListener(GoFreeEvent.COMPLETED,dataLoaded);
+					gVar.vData.goFree.downloadObject("waypoints");
+				}
+			}
+			
+			protected function dataLoaded(event:GoFreeEvent):void
+			{
+				if (event.returnObject != null)
+				{
+					try
+					{
+						var downloadedWaypoint:ArrayCollection = new ArrayCollection;
+						for each (var o:Object in event.returnObject as ArrayCollection)
+						{
+							var w:GPSPoint = new GPSPoint(o);
+							downloadedWaypoint.addItem(w);
+						}
+						gVar.waypoints = downloadedWaypoint;
+						gVar.vData.goFree.removeEventListener(GoFreeEvent.COMPLETED,dataLoaded);
+					}
+					catch (er:Error)
+					{
+						trace("Unable to process -", er.toString());
+					}
+				}
+			}
+			protected function btnLoad_clickHandler(event:MouseEvent):void
+			{
+				if (gVar.vData.goFree.isRed)
+				{
+					gVar.vData.goFree.addEventListener(GoFreeEvent.COMPLETED,marksLoaded);
+					gVar.vData.goFree.downloadObject("marks");
+				}
+			}
+			
+			protected function marksLoaded(event:GoFreeEvent):void
+			{
+				if (event.returnObject != null)
+				{
+					try
+					{
+						var downloadedMarks:ArrayCollection = new ArrayCollection;
+						for each (var o:Object in event.returnObject as ArrayCollection)
+						{
+							var w:CourseMark = new CourseMark();
+							w.loadFromObject(o,gVar.waypoints);
+							downloadedMarks.addItem(w);
+						}
+						gVar.marks = downloadedMarks;
+						gVar.vData.goFree.addEventListener(GoFreeEvent.COMPLETED,dataLoaded);
+					}
+					catch (er:Error)
+					{
+						trace("Unable to process -", er.toString());
+					}
+				}
+			}
+			
+			
+			
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<s:Callout id="coOpenURL"
+				   horizontalPosition="middle"
+				   verticalPosition="middle">
+			
+			<s:VGroup horizontalAlign="center"
+					  paddingTop="10" paddingLeft="5" paddingRight="10">
+				
+				<s:Label text="GPX File Received!" />
+				<s:Label text="{gpxDetails}" />
+				<s:Button label="Add to Existing" click="addToExisting_clickHandler(event)"/>
+				<s:Button label="Replace Existing" click="replaceExisting_clickHandler(event)"/>
+				<s:Button label="Cancel" click="coOpenURL.close();"/>
+			</s:VGroup>
+		</s:Callout>
+	</fx:Declarations>
+	
+	<s:VGroup width="100%">
+		<Components:HContainer width="100%">
+			<s:Label width="100%" text="[Red]Racer uses GPX files to exchange waypoint and course information with other apps"/>
+			<s:CalloutButton horizontalPosition="auto" icon="{images.Icon_Help}"  width="48" height="48"
+							 verticalPosition="before">
+				<s:calloutLayout>
+					<s:VerticalLayout paddingBottom="2" paddingLeft="2" paddingRight="2" paddingTop="2" />
+				</s:calloutLayout>
+				<s:Label width="100%" fontSize="14" textAlign="left"
+						 text="[Red]Racer uses GPX files to exchange waypoint and course information with the outside world. GPX files can be created and edited by the majority of chartplotters and desktop mapping applications." />
+				<s:Button label="More Information" click="{navigateToURL(new URLRequest('http://www.regattared.com/topics/data-exchange'))}" />
+			</s:CalloutButton>
+			
+		</Components:HContainer>
+		<s:HGroup width="100%">
+			<s:Label id="lblError" width="80%" color="#FF0000" textAlign="center" verticalAlign="middle"/>
+			<s:BusyIndicator id="BusyIndicator" visible="false"/>		
+		</s:HGroup>
+	</s:VGroup>
+	<s:Panel title="Export Data" width="100%" fontSize="14">
+		<s:layout.landscape>
+			<s:HorizontalLayout paddingBottom="2" paddingLeft="2" paddingRight="2" paddingTop="2" />
+		</s:layout.landscape>
+		<s:layout.portrait>
+			<s:VerticalLayout  paddingBottom="2" paddingLeft="2" paddingRight="2" paddingTop="2" />
+		</s:layout.portrait>
+		
+		<s:VGroup width.portrait="100%" width.landscape="50%" horizontalAlign="left" paddingLeft="20" height="100%" verticalAlign="middle">
+			<s:CheckBox id="cbWaypoints" label="Waypoints" selected="true" />
+			<s:CheckBox id="cbMarks" label="Marks" selected="true"  />
+		</s:VGroup>
+		<s:VGroup width.portrait="100%" width.landscape="50%" horizontalAlign="center">
+			<s:HGroup width="100%">
+				<s:TextInput id="tiEmail" width="70%" height="100%" text="@{gVar.email}"
+							 softKeyboardType="email" />
+				<s:Button id="btnEmail" label="Email" width="30%" click="btnEmail_clickHandler(event)"/>
+			</s:HGroup>
+			<s:Button id="btnAnalytics" label="To [Red] Analytics" width="85%"  enabled="false" />
+			<s:Button id="btnExpedition" label="To Expedition" width="85%"  enabled="false" />			
+		</s:VGroup>
+	</s:Panel>
+	
+	
+</s:View>

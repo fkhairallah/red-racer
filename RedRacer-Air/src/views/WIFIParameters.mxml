@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		xmlns:Components="Components.*"
+		title="WIFI Parameters"
+		initialize="view1_initializeHandler(event)">
+	<s:layout>
+		<s:VerticalLayout horizontalAlign="center" paddingTop="5" paddingLeft="5" paddingRight="5" paddingBottom="0"/>
+	</s:layout>
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import Skins.ToggleSwitchSkin;
+			
+			protected function view1_initializeHandler(event:FlexEvent):void
+			{
+				tiIP.text = gVar.vData.ip;
+				tiPort.text = gVar.vData.port.toFixed(0);
+			}
+			
+			protected function btnSave_clickHandler(event:MouseEvent):void
+			{
+				gVar.vData.udpMode = tsUDP.selected;
+				gVar.vData.ip = tiIP.text;
+				gVar.vData.port = parseInt(tiPort.text);
+				navigator.popView();
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:Label text="WIFI Connection Paramters" />
+	<Components:CustomSlideSwitch id="tsUDP" selectedLabel="UDP Mode" deselectedLabel="TCP Mode" 
+								  selected="{gVar.vData.udpMode}"
+								  skinClass="Skins.ToggleSwitchSkin"/>
+
+	<s:HGroup width="100%" visible="{!tsUDP.selected}" verticalAlign="middle">
+		<s:Label text="Host IP" width="50%" />
+		<s:TextInput id="tiIP" width="50%" />
+	</s:HGroup>	
+	<s:HGroup width="100%" verticalAlign="middle">
+		<s:Label text="Port #" width="50%" />
+		<s:TextInput id="tiPort" width="50%" />
+	</s:HGroup>
+	<s:Button id="btnSave" label="Save" click="btnSave_clickHandler(event)" />
+</s:View>

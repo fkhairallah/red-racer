@@ -1,0 +1,112 @@
+<rrPolars>
+<boat>
+<name>Schock Therapy</name>
+<maker>W.D. Schock</maker>
+<model>S34PC</model>
+<year>1987</year>
+</boat>
+<factoryPolars>
+<polar TWS="3">
+<TWA  value="36" targetAngle="46.5" V="1.972" VMG="1.595" Heel="1.5" Reef="1" Flat="1" AWS="4.9" AWA="25.9" Lee="2.9"/>
+<TWA  value="44" targetAngle="46.5" V="2.433" VMG="1.75" Heel="1.6" Reef="1" Flat="1" AWS="5.2" AWA="29.7" Lee="1.9"/>
+<TWA  value="46.5" targetAngle="46.5" V="2.556" VMG="1.76" Heel="1.7" Reef="1" Flat="1" AWS="5.2" AWA="30.7" Lee="1.7"/>
+<TWA  value="52" targetAngle="46.5" V="2.795" VMG="1.721" Heel="1.7" Reef="1" Flat="1" AWS="5.3" AWA="32.9" Lee="1.4"/>
+<TWA  value="60" targetAngle="46.5" V="3.066" VMG="1.533" Heel="1.7" Reef="1" Flat="1" AWS="5.4" AWA="36" Lee="1"/>
+<TWA  value="70" targetAngle="46.5" V="3.284" VMG="1.123" Heel="1.7" Reef="1" Flat="1" AWS="5.3" AWA="40" Lee="0.6"/>
+<TWA  value="80" targetAngle="46.5" V="3.37" VMG="0.585" Heel="1.6" Reef="1" Flat="1" AWS="5" AWA="44.4" Lee="0.4"/>
+<TWA  value="90" targetAngle="46.5" V="3.337" VMG="0" Heel="1.4" Reef="1" Flat="1" AWS="4.6" AWA="49.4" Lee="0.1"/>
+<TWA  value="105" targetAngle="140" V="3.237" VMG="-0.838" Heel="1.2" Reef="1" Flat="1" AWS="3.9" AWA="57.4" Lee="0"/>
+<TWA  value="120" targetAngle="140" V="2.863" VMG="-1.432" Heel="0.8" Reef="1" Flat="1" AWS="3" AWA="69.9" Lee="0"/>
+<TWA  value="135" targetAngle="140" V="2.364" VMG="-1.672" Heel="0.4" Reef="1" Flat="1" AWS="2.2" AWA="90.1" Lee="0"/>
+<TWA  value="140.6" targetAngle="140" V="2.181" VMG="-1.685" Heel="0.3" Reef="1" Flat="1" AWS="2" AWA="100" Lee="0"/>
+<TWA  value="150" targetAngle="140" V="1.896" VMG="-1.642" Heel="0.1" Reef="1" Flat="1" AWS="1.8" AWA="119.1" Lee="0"/>
+<TWA  value="165" targetAngle="140" V="1.617" VMG="-1.562" Heel="0.1" Reef="1" Flat="1" AWS="1.6" AWA="150.2" Lee="0"/>
+<TWA  value="180" targetAngle="140" V="1.496" VMG="-1.496" Heel="0" Reef="1" Flat="1" AWS="1.6" AWA="180" Lee="0"/>
+</polar>
+<polar TWS="5">
+<TWA  value="36" targetAngle="45.3" V="3.18" VMG="2.573" Heel="2.9" Reef="1" Flat="1" AWS="8" AWA="26" Lee="3.1"/>
+<TWA  value="44" targetAngle="45.3" V="3.871" VMG="2.785" Heel="3.2" Reef="1" Flat="1" AWS="8.4" AWA="30" Lee="2.1"/>
+<TWA  value="45.3" targetAngle="45.3" V="3.965" VMG="2.789" Heel="3.2" Reef="1" Flat="1" AWS="8.5" AWA="30.6" Lee="2"/>
+<TWA  value="52" targetAngle="45.3" V="4.375" VMG="2.694" Heel="3.3" Reef="1" Flat="1" AWS="8.6" AWA="33.6" Lee="1.5"/>
+<TWA  value="60" targetAngle="45.3" V="4.737" VMG="2.368" Heel="3.3" Reef="1" Flat="1" AWS="8.6" AWA="37.1" Lee="1.1"/>
+<TWA  value="70" targetAngle="45.3" V="5.019" VMG="1.717" Heel="3.2" Reef="1" Flat="1" AWS="8.4" AWA="41.5" Lee="0.8"/>
+<TWA  value="80" targetAngle="45.3" V="5.123" VMG="0.89" Heel="2.9" Reef="1" Flat="1" AWS="7.9" AWA="46.4" Lee="0.5"/>
+<TWA  value="90" targetAngle="143" V="5.132" VMG="0" Heel="2.8" Reef="1" Flat="1" AWS="7.3" AWA="51.4" Lee="0.2"/>
+<TWA  value="105" targetAngle="143" V="4.961" VMG="-1.284" Heel="2.2" Reef="1" Flat="1" AWS="6.2" AWA="60.4" Lee="0"/>
+<TWA  value="120" targetAngle="143" V="4.463" VMG="-2.231" Heel="1.5" Reef="1" Flat="1" AWS="4.9" AWA="73" Lee="0"/>
+<TWA  value="135" targetAngle="143" V="3.784" VMG="-2.675" Heel="0.8" Reef="1" Flat="1" AWS="3.7" AWA="92.4" Lee="0"/>
+<TWA  value="143" targetAngle="143" V="3.41" VMG="-2.723" Heel="0.5" Reef="1" Flat="1" AWS="3.2" AWA="106.2" Lee="0"/>
+<TWA  value="150" targetAngle="143" V="3.089" VMG="-2.675" Heel="0.3" Reef="1" Flat="1" AWS="3" AWA="120.3" Lee="0"/>
+<TWA  value="165" targetAngle="143" V="2.658" VMG="-2.568" Heel="0.1" Reef="1" Flat="1" AWS="2.7" AWA="150.6" Lee="0"/>
+<TWA  value="180" targetAngle="143" V="2.464" VMG="-2.464" Heel="0.1" Reef="1" Flat="1" AWS="2.7" AWA="180" Lee="0"/>
+</polar>
+<polar TWS="7">
+<TWA  value="36" targetAngle="44.8" V="4.254" VMG="3.442" Heel="5" Reef="1" Flat="1" AWS="11" AWA="26.1" Lee="3.3"/>
+<TWA  value="44" targetAngle="44.8" V="5.088" VMG="3.66" Heel="6.2" Reef="1" Flat="1" AWS="11.5" AWA="30.4" Lee="2.3"/>
+<TWA  value="44.8" targetAngle="44.8" V="5.163" VMG="3.662" Heel="6.3" Reef="1" Flat="1" AWS="11.5" AWA="30.8" Lee="2.3"/>
+<TWA  value="52" targetAngle="44.8" V="5.732" VMG="3.529" Heel="7.2" Reef="1" Flat="1" AWS="11.7" AWA="34.1" Lee="1.7"/>
+<TWA  value="60" targetAngle="44.8" V="6.111" VMG="3.055" Heel="6.8" Reef="1" Flat="1" AWS="11.6" AWA="38.1" Lee="1.3"/>
+<TWA  value="70" targetAngle="44.8" V="6.333" VMG="2.166" Heel="5.4" Reef="1" Flat="1" AWS="11.2" AWA="43.3" Lee="1"/>
+<TWA  value="80" targetAngle="44.8" V="6.397" VMG="1.111" Heel="4.5" Reef="1" Flat="1" AWS="10.5" AWA="48.8" Lee="0.7"/>
+<TWA  value="90" targetAngle="144.7" V="6.465" VMG="0" Heel="4.5" Reef="1" Flat="1" AWS="9.7" AWA="54.3" Lee="0.3"/>
+<TWA  value="105" targetAngle="144.7" V="6.312" VMG="-1.634" Heel="3.3" Reef="1" Flat="1" AWS="8.3" AWA="63.7" Lee="0"/>
+<TWA  value="120" targetAngle="144.7" V="5.873" VMG="-2.936" Heel="2.2" Reef="1" Flat="1" AWS="6.7" AWA="75.7" Lee="0"/>
+<TWA  value="135" targetAngle="144.7" V="5.029" VMG="-3.556" Heel="1.2" Reef="1" Flat="1" AWS="5.2" AWA="95.1" Lee="0"/>
+<TWA  value="144.7" targetAngle="144.7" V="4.488" VMG="-3.661" Heel="0.7" Reef="1" Flat="1" AWS="4.5" AWA="111.4" Lee="0"/>
+<TWA  value="150" targetAngle="144.7" V="4.195" VMG="-3.633" Heel="0.5" Reef="1" Flat="1" AWS="4.2" AWA="121.7" Lee="0"/>
+<TWA  value="165" targetAngle="144.7" V="3.659" VMG="-3.535" Heel="0.3" Reef="1" Flat="1" AWS="3.9" AWA="151" Lee="0"/>
+<TWA  value="180" targetAngle="144.7" V="3.402" VMG="-3.402" Heel="0.1" Reef="1" Flat="1" AWS="3.9" AWA="180" Lee="0"/>
+</polar>
+<polar TWS="10">
+<TWA  value="36" targetAngle="41.6" V="5.237" VMG="4.237" Heel="16.5" Reef="1" Flat="0.89" AWS="14.8" AWA="25.6" Lee="3.6"/>
+<TWA  value="41.6" targetAngle="41.6" V="5.889" VMG="4.401" Heel="18.7" Reef="1" Flat="0.89" AWS="15.1" AWA="28.7" Lee="2.8"/>
+<TWA  value="44" targetAngle="41.6" V="6.082" VMG="4.375" Heel="19.4" Reef="1" Flat="0.9" AWS="15.1" AWA="30.1" Lee="2.6"/>
+<TWA  value="52" targetAngle="41.6" V="6.533" VMG="4.022" Heel="21.1" Reef="1" Flat="0.95" AWS="15" AWA="34.6" Lee="2.2"/>
+<TWA  value="60" targetAngle="41.6" V="6.827" VMG="3.413" Heel="21.1" Reef="1" Flat="1" AWS="14.6" AWA="39.5" Lee="1.9"/>
+<TWA  value="70" targetAngle="41.6" V="7.06" VMG="2.415" Heel="17.7" Reef="1" Flat="1" AWS="14.1" AWA="46.1" Lee="1.5"/>
+<TWA  value="80" targetAngle="41.6" V="7.192" VMG="1.249" Heel="13.6" Reef="1" Flat="1" AWS="13.4" AWA="52.9" Lee="1.1"/>
+<TWA  value="90" targetAngle="148.3" V="7.303" VMG="0" Heel="13.2" Reef="1" Flat="1" AWS="12.5" AWA="59.6" Lee="0.7"/>
+<TWA  value="105" targetAngle="148.3" V="7.266" VMG="-1.881" Heel="5" Reef="1" Flat="1" AWS="11" AWA="70.8" Lee="0.1"/>
+<TWA  value="120" targetAngle="148.3" V="6.968" VMG="-3.484" Heel="3.1" Reef="1" Flat="1" AWS="9.2" AWA="83.5" Lee="0"/>
+<TWA  value="135" targetAngle="148.3" V="6.497" VMG="-4.594" Heel="1.8" Reef="1" Flat="1" AWS="7.4" AWA="100" Lee="0"/>
+<TWA  value="148.3" targetAngle="148.3" V="5.835" VMG="-4.965" Heel="0.9" Reef="1" Flat="1" AWS="6.3" AWA="120.5" Lee="0"/>
+<TWA  value="150" targetAngle="148.3" V="5.73" VMG="-4.962" Heel="0.9" Reef="1" Flat="1" AWS="6.2" AWA="123.6" Lee="0"/>
+<TWA  value="165" targetAngle="148.3" V="5.05" VMG="-4.878" Heel="0.5" Reef="1" Flat="1" AWS="5.7" AWA="151.9" Lee="0"/>
+<TWA  value="180" targetAngle="148.3" V="4.719" VMG="-4.719" Heel="0.3" Reef="1" Flat="1" AWS="5.7" AWA="180" Lee="0"/>
+</polar>
+<polar TWS="14">
+<TWA  value="36" targetAngle="39.4" V="5.753" VMG="4.655" Heel="23.1" Reef="0.97" Flat="0.68" AWS="19.1" AWA="24.9" Lee="3.5"/>
+<TWA  value="39.4" targetAngle="39.4" V="6.119" VMG="4.726" Heel="23.6" Reef="0.97" Flat="0.68" AWS="19.2" AWA="27.2" Lee="3"/>
+<TWA  value="44" targetAngle="39.4" V="6.455" VMG="4.644" Heel="24.3" Reef="0.96" Flat="0.72" AWS="19.1" AWA="30.2" Lee="2.7"/>
+<TWA  value="52" targetAngle="39.4" V="6.856" VMG="4.221" Heel="25.3" Reef="0.93" Flat="0.83" AWS="18.8" AWA="35.5" Lee="2.4"/>
+<TWA  value="60" targetAngle="39.4" V="7.145" VMG="3.572" Heel="26.2" Reef="0.92" Flat="0.92" AWS="18.2" AWA="40.9" Lee="2.2"/>
+<TWA  value="70" targetAngle="39.4" V="7.428" VMG="2.54" Heel="26.9" Reef="0.94" Flat="1" AWS="17.2" AWA="48" Lee="1.9"/>
+<TWA  value="80" targetAngle="39.4" V="7.675" VMG="1.333" Heel="26.7" Reef="0.99" Flat="1" AWS="16.2" AWA="55.5" Lee="1.6"/>
+<TWA  value="90" targetAngle="39.4" V="7.891" VMG="0" Heel="21.9" Reef="1" Flat="1" AWS="15.5" AWA="63.9" Lee="1.2"/>
+<TWA  value="105" targetAngle="169" V="8.115" VMG="-2.1" Heel="14.9" Reef="1" Flat="1" AWS="14.2" AWA="76.8" Lee="0.4"/>
+<TWA  value="120" targetAngle="169" V="7.964" VMG="-3.982" Heel="4.4" Reef="1" Flat="1" AWS="12.6" AWA="90.9" Lee="0"/>
+<TWA  value="135" targetAngle="169" V="7.529" VMG="-5.324" Heel="2.4" Reef="1" Flat="1" AWS="10.7" AWA="107.7" Lee="0"/>
+<TWA  value="150" targetAngle="169" V="6.987" VMG="-6.051" Heel="1.4" Reef="1" Flat="1" AWS="9.2" AWA="128.7" Lee="0"/>
+<TWA  value="165" targetAngle="169" V="6.572" VMG="-6.348" Heel="0.9" Reef="1" Flat="1" AWS="8.4" AWA="153.5" Lee="0"/>
+<TWA  value="169" targetAngle="169" V="6.479" VMG="-6.36" Heel="0.7" Reef="1" Flat="1" AWS="8.3" AWA="160.6" Lee="0"/>
+<TWA  value="180" targetAngle="169" V="6.292" VMG="-6.292" Heel="0.5" Reef="1" Flat="1" AWS="8.3" AWA="180" Lee="0"/>
+</polar>
+<polar TWS="20">
+<TWA  value="36" targetAngle="39.3" V="5.942" VMG="4.807" Heel="24.7" Reef="0.81" Flat="0.69" AWS="25.1" AWA="25" Lee="4"/>
+<TWA  value="39.3" targetAngle="39.3" V="6.314" VMG="4.883" Heel="25.5" Reef="0.8" Flat="0.7" AWS="25.1" AWA="27.5" Lee="3.5"/>
+<TWA  value="44" targetAngle="39.3" V="6.665" VMG="4.794" Heel="26.2" Reef="0.79" Flat="0.76" AWS="25" AWA="30.9" Lee="3.1"/>
+<TWA  value="52" targetAngle="39.3" V="7.084" VMG="4.361" Heel="27.5" Reef="0.77" Flat="0.87" AWS="24.4" AWA="36.7" Lee="2.7"/>
+<TWA  value="60" targetAngle="39.3" V="7.396" VMG="3.698" Heel="28.3" Reef="0.76" Flat="0.99" AWS="23.6" AWA="42.7" Lee="2.5"/>
+<TWA  value="70" targetAngle="39.3" V="7.723" VMG="2.641" Heel="28.4" Reef="0.79" Flat="1" AWS="22.4" AWA="50.7" Lee="2.1"/>
+<TWA  value="80" targetAngle="39.3" V="8.036" VMG="1.395" Heel="28.4" Reef="0.83" Flat="1" AWS="21.2" AWA="59.1" Lee="1.7"/>
+<TWA  value="90" targetAngle="39.3" V="8.327" VMG="0" Heel="28.9" Reef="0.9" Flat="1" AWS="19.8" AWA="67.9" Lee="1.4"/>
+<TWA  value="105" targetAngle="172.6" V="8.84" VMG="-2.288" Heel="28.6" Reef="1" Flat="1" AWS="17.7" AWA="82.4" Lee="0.6"/>
+<TWA  value="120" targetAngle="172.6" V="9.201" VMG="-4.601" Heel="13.9" Reef="1" Flat="1" AWS="17.5" AWA="97.3" Lee="0"/>
+<TWA  value="135" targetAngle="172.6" V="8.848" VMG="-6.256" Heel="3.7" Reef="1" Flat="1" AWS="15.8" AWA="113.9" Lee="0"/>
+<TWA  value="150" targetAngle="172.6" V="8.288" VMG="-7.178" Heel="2.3" Reef="1" Flat="1" AWS="14.3" AWA="133.9" Lee="0"/>
+<TWA  value="165" targetAngle="172.6" V="7.903" VMG="-7.634" Heel="1.5" Reef="1" Flat="1" AWS="13.4" AWA="156.3" Lee="0"/>
+<TWA  value="172.6" targetAngle="172.6" V="7.751" VMG="-7.687" Heel="1.2" Reef="1" Flat="1" AWS="13.2" AWA="168.3" Lee="0"/>
+<TWA  value="180" targetAngle="172.6" V="7.648" VMG="-7.648" Heel="0.9" Reef="1" Flat="1" AWS="13.2" AWA="180" Lee="0"/>
+</polar>
+</factoryPolars>
+</rrPolars>

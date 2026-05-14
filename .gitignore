@@ -1,0 +1,29 @@
+# Claude Code memory
+.claude/
+
+# Dependencies
+node_modules/
+
+# Build output
+client/dist/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+*.suo
+*.user
+
+# Logs
+*.log
+npm-debug.log*
+
+# TypeScript cache
+*.tsbuildinfo

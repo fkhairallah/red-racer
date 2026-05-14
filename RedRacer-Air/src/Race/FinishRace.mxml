@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		viewActivate="viewActivateHandler(event)"
+		title="Finish Line" xmlns:Components="Components.*" xmlns:mx="library://ns.adobe.com/flex/mx">
+	<s:states>
+		<s:State name="portrait"/>
+		<s:State name="landscape"/>
+	</s:states>
+	<fx:Script>
+		<![CDATA[
+			import mx.events.ValidationResultEvent;
+			import mx.rpc.CallResponder;
+			import mx.rpc.events.ResultEvent;
+			import mx.validators.EmailValidator;
+			
+			import spark.events.ViewNavigatorEvent;
+			
+			import Model.Course.RaceCourse;
+			
+			import Utilities.DateAndTime;
+			
+			import services.redracerws.RedRacerWS;
+			
+			import valueObjects.WSResponse;
+			
+			protected function viewActivateHandler(event:ViewNavigatorEvent):void
+			{
+				updateDisplay();
+			}
+			
+			protected function updateDisplay():void
+			{
+				if (gVar.course.status == RaceCourse.ST_INPROGRESS)
+				{
+					panelInProgress.visible = true;
+					panelCompleted.visible = false;
+				}
+				else
+				{
+					panelInProgress.visible = false;
+					panelCompleted.visible = true;
+					
+					if (gVar.distance.showMetric) 
+					{
+						lblTimes.text = "From " + dateFormatter24.format(gVar.course.startTime)					
+							+ " to " + dateFormatter24.format(gVar.course.endTime);					
+					} 
+					else 
+					{
+						lblTimes.text = "From " + dateFormatter.format(gVar.course.startTime)					
+							+ " to " + dateFormatter.format(gVar.course.endTime);					
+					}
+					
+					lblElapsedTime.text = DateAndTime.elapsedTime(gVar.course.startTime, gVar.course.endTime);
+					
+					
+				}
+				
+			}
+			
+			protected function btnFinish_clickHandler(event:MouseEvent):void
+			{
+				rtc.stop();
+				gVar.course.endRace();
+				updateDisplay();
+			}
+			
+			protected function btnDone_clickHandler(event:MouseEvent):void
+			{
+				gVar.course = new RaceCourse();
+				navigator.popToFirstView();
+			}
+			
+			protected function btnNewRace_clickHandler(event:MouseEvent):void
+			{
+				gVar.course.resetCourse();
+				navigator.popToFirstView();
+			}
+			
+			/*************************************************************************************************
+			 *
+			 * Send via email 
+			 * 
+			 * **********************************************************************************************/
+			protected var sendWebService:CallResponder;
+			protected function btnEmail_clickHandler(event:MouseEvent):void
+			{
+				// create email validator
+				var ev:EmailValidator = new EmailValidator;
+				ev.listener = tiEmail;
+				var evr:ValidationResultEvent = ev.validate(tiEmail.text);
+				if ( (tiEmail.text == "") || (evr.type == ValidationResultEvent.INVALID)) {
+					tiEmail.setStyle("contentBackgroundColor", "0xFFAAAA");
+					return;
+				}
+				
+				
+				tiEmail.setStyle("contentBackgroundColor", "0xffffff");
+				
+				gVar.email = gVar.email.toLowerCase(); // insure email is lower case
+				
+				// create XML string within CDATA block
+				var jsCourse:String = JSON.stringify(gVar.course);
+				
+				// send Data to Server
+				sendWebService = new CallResponder;
+				sendWebService.token = (new RedRacerWS).emailRaceCourse(
+					42,
+					"com.deligent.redracer",
+					gVar.email,
+					jsCourse,
+					lblElapsedTime.text);
+				sendWebService.addEventListener(ResultEvent.RESULT,emailCourseResults);
+				
+				// Turn the spinner on
+				lblError.text = "Sending...";
+				BusyIndicator.visible = true;
+				btnEmail.enabled = false;
+				
+			}
+			
+			
+			private function emailCourseResults(event:ResultEvent):void
+			{
+				BusyIndicator.visible = false;
+				btnEmail.enabled = true;
+				var result:WSResponse = sendWebService.lastResult;
+				lblError.text = result.message;
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<mx:DateFormatter id="dateFormatter" formatString="L:NN:SS A"/>
+		<mx:DateFormatter id="dateFormatter24" formatString="HH:NN:SS"/>
+	</fx:Declarations>
+	
+	<s:Panel id="panelInProgress" title="Race in Progress" 
+			 width="75%" height="75%" visible="false" horizontalCenter="0" verticalCenter="0">
+		<s:layout>
+			<s:VerticalLayout horizontalAlign="center" />
+		</s:layout>
+		<Components:dGaugeElapsedTime id="rtc" since="{gVar.course.startTime}" width="100%" />
+		<s:Label id="lblTimer" width="100%" fontSize="36" />
+		<s:Button id="btnFinish" label="Finish" width="80%" 
+				  click="btnFinish_clickHandler(event)" />
+		
+	</s:Panel>
+	
+	<s:Panel id="panelCompleted" title="Race Completed"
+			 width="100%" height="100%">
+		<s:layout>
+			<s:VerticalLayout horizontalAlign="center" gap="10"
+							  paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5"/>
+		</s:layout>
+		<s:Label id="lblTimes" fontFamily="Times" />
+		<s:HGroup width="100%" verticalAlign="middle">
+			<s:Label text="Elapsed time of: " />
+			<s:Label id="lblElapsedTime" fontSize="32" fontFamily="Times" />
+		</s:HGroup>
+		<s:HGroup width="100%">
+			<s:Label id="lblError" width="80%" color="#FF0000" textAlign="center" verticalAlign="middle"/>
+			<s:BusyIndicator id="BusyIndicator" visible="false"/>		
+		</s:HGroup>
+		<s:HGroup width="100%">
+			<s:TextInput id="tiEmail" width="70%" height="100%" text="@{gVar.email}"
+						 softKeyboardType="email" />
+			<s:Button id="btnEmail" label="Email" width="30%" click="btnEmail_clickHandler(event)"/>
+		</s:HGroup>
+		<s:Group width="100%">
+			<s:layout.landscape>
+				<s:HorizontalLayout horizontalAlign="center"  />
+			</s:layout.landscape>
+			<s:layout.portrait>
+				<s:VerticalLayout horizontalAlign="center"/>
+			</s:layout.portrait>
+
+			<s:Button id="btnNewRace" label="Start Similar Race" width.portrait="80%" width.landscape="45%"
+					  click="btnNewRace_clickHandler(event)"/> 
+			<s:Button id="btnDone" label="Done" width.portrait="80%" width.landscape="45%"
+					  click="btnDone_clickHandler(event)"/>
+			
+		</s:Group>
+		
+	</s:Panel>
+	
+	
+</s:View>

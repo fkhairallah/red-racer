@@ -1,0 +1,80 @@
+<rrPolars>
+<boat>
+<name>J109</name>
+<maker>J Boats</maker>
+<model>109</model>
+<year>0</year>
+</boat>
+<factoryPolars>
+<polar TWS="6">
+<TWA value="44.8" targetAngle="44.8" V="4.9" VMG="3.5" Heel="" />
+<TWA value="70.0" targetAngle="44.8" V="6.1" VMG="2.1" Heel="" />
+<TWA value="90.0" targetAngle="140.7" V="6.5" VMG="0.0" Heel="" />
+<TWA value="110.0" targetAngle="140.7" V="6.5" VMG="2.2" Heel="" />
+<TWA value="120.0" targetAngle="140.7" V="6.2" VMG="3.1" Heel="" />
+<TWA value="135.0" targetAngle="140.7" V="5.4" VMG="3.8" Heel="" />
+<TWA value="140.7" targetAngle="140.7" V="5.0" VMG="3.9" Heel="" />
+<TWA value="180.0" targetAngle="140.7" V="3.2" VMG="3.2" Heel="" />
+</polar>
+<polar TWS="8">
+<TWA value="43.4" targetAngle="43.4" V="5.7" VMG="4.1" Heel="" />
+<TWA value="70.0" targetAngle="43.4" V="6.9" VMG="2.4" Heel="" />
+<TWA value="90.0" targetAngle="143.5" V="7.2" VMG="0.0" Heel="" />
+<TWA value="110.0" targetAngle="143.5" V="7.3" VMG="2.5" Heel="" />
+<TWA value="120.0" targetAngle="143.5" V="7.1" VMG="3.5" Heel="" />
+<TWA value="135.0" targetAngle="143.5" V="6.6" VMG="4.7" Heel="" />
+<TWA value="143.5" targetAngle="143.5" V="6.0" VMG="4.9" Heel="" />
+<TWA value="180.0" targetAngle="143.5" V="4.2" VMG="4.2" Heel="" />
+</polar>
+<polar TWS="10">
+<TWA value="41.4" targetAngle="41.4" V="6.1" VMG="4.6" Heel="" />
+<TWA value="70.0" targetAngle="41.4" V="7.3" VMG="2.5" Heel="" />
+<TWA value="90.0" targetAngle="148.9" V="7.5" VMG="0.0" Heel="" />
+<TWA value="110.0" targetAngle="148.9" V="7.7" VMG="2.6" Heel="" />
+<TWA value="120.0" targetAngle="148.9" V="7.7" VMG="3.8" Heel="" />
+<TWA value="135.0" targetAngle="148.9" V="7.3" VMG="5.1" Heel="" />
+<TWA value="148.9" targetAngle="148.9" V="6.5" VMG="5.6" Heel="" />
+<TWA value="180.0" targetAngle="148.9" V="5.2" VMG="5.2" Heel="" />
+</polar>
+<polar TWS="12">
+<TWA value="40.0" targetAngle="40.0" V="6.3" VMG="4.8" Heel="" />
+<TWA value="70.0" targetAngle="40.0" V="7.5" VMG="2.6" Heel="" />
+<TWA value="90.0" targetAngle="160.0" V="7.7" VMG="0.0" Heel="" />
+<TWA value="110.0" targetAngle="160.0" V="8.1" VMG="2.8" Heel="" />
+<TWA value="135.0" targetAngle="160.0" V="7.8" VMG="5.5" Heel="" />
+<TWA value="150.0" targetAngle="160.0" V="7.1" VMG="6.1" Heel="" />
+<TWA value="160.0" targetAngle="160.0" V="6.6" VMG="6.2" Heel="" />
+<TWA value="180.0" targetAngle="160.0" V="6.1" VMG="6.1" Heel="" />
+</polar>
+<polar TWS="14">
+<TWA value="39.1" targetAngle="39.1" V="6.4" VMG="5.0" Heel="" />
+<TWA value="70.0" targetAngle="39.1" V="7.7" VMG="2.6" Heel="" />
+<TWA value="90.0" targetAngle="168.9" V="8.0" VMG="0.0" Heel="" />
+<TWA value="110.0" targetAngle="168.9" V="8.3" VMG="2.8" Heel="" />
+<TWA value="135.0" targetAngle="168.9" V="8.2" VMG="5.8" Heel="" />
+<TWA value="150.0" targetAngle="168.9" V="7.6" VMG="6.6" Heel="" />
+<TWA value="168.9" targetAngle="168.9" V="7.0" VMG="6.8" Heel="" />
+<TWA value="180.0" targetAngle="168.9" V="6.8" VMG="6.8" Heel="" />
+</polar>
+<polar TWS="16">
+<TWA value="38.6" targetAngle="38.6" V="6.5" VMG="5.0" Heel="" />
+<TWA value="70.0" targetAngle="38.6" V="7.8" VMG="2.7" Heel="" />
+<TWA value="90.0" targetAngle="173.1" V="8.2" VMG="0.0" Heel="" />
+<TWA value="110.0" targetAngle="173.1" V="8.5" VMG="2.9" Heel="" />
+<TWA value="135.0" targetAngle="173.1" V="8.7" VMG="6.1" Heel="" />
+<TWA value="150.0" targetAngle="173.1" V="8.0" VMG="7.0" Heel="" />
+<TWA value="173.1" targetAngle="173.1" V="7.4" VMG="7.3" Heel="" />
+<TWA value="180.0" targetAngle="173.1" V="7.3" VMG="7.3" Heel="" />
+</polar>
+<polar TWS="20">
+<TWA value="38.6" targetAngle="38.6" V="6.5" VMG="5.1" Heel="" />
+<TWA value="69.8" targetAngle="38.6" V="7.9" VMG="2.7" Heel="" />
+<TWA value="90.0" targetAngle="174.6" V="8.4" VMG="0.0" Heel="" />
+<TWA value="109.9" targetAngle="174.6" V="8.9" VMG="3.0" Heel="" />
+<TWA value="135.0" targetAngle="174.6" V="9.6" VMG="6.8" Heel="" />
+<TWA value="150.0" targetAngle="174.6" V="8.9" VMG="7.7" Heel="" />
+<TWA value="174.6" targetAngle="174.6" V="8.2" VMG="8.2" Heel="" />
+<TWA value="180.0" targetAngle="174.6" V="8.2" VMG="8.2" Heel="" />
+</polar>
+</factoryPolars>
+</rrPolars>

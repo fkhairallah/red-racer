@@ -1,0 +1,229 @@
+
+<model xmlns="http://ns.adobe.com/Fiber/1.0">
+  <annotation name="ActionScriptGeneration">
+    <item name="FullyQualifyReferences">true</item>
+  </annotation>
+  <entity name="EntityKeyMember">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">EntityKeyMember</item>
+    </annotation>
+    <annotation name="service Group"/>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <property name="Key" type="string"/>
+  </entity>
+  <entity name="EntityKey">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">EntityKey</item>
+    </annotation>
+    <annotation name="WSDLCollectionTypes">
+      <item name="EntityKeyValues">http://tempuri.org/,ArrayOfEntityKeyMember</item>
+    </annotation>
+    <annotation name="service Group"/>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <property name="EntitySetName" type="string"/>
+    <property name="EntityContainerName" type="string"/>
+    <property name="EntityKeyValues" type="EntityKeyMember[]"/>
+  </entity>
+  <entity name="Location">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">Location</item>
+    </annotation>
+    <annotation name="service Group"/>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <property name="_EntityKey" type="EntityKey"/>
+    <property name="Id" type="integer"/>
+    <property name="vesselId" type="integer"/>
+    <property name="lat" type="double"/>
+    <property name="lon" type="double"/>
+    <property name="speed" type="double"/>
+    <property name="heading" type="double"/>
+    <property name="timeStamp" type="date"/>
+    <property name="status" type="string"/>
+  </entity>
+  <entity name="WindAndMetadata">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">WindAndMetadata</item>
+    </annotation>
+    <annotation name="service Group"/>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="WSDLCollectionTypes">
+      <item name="data">http://opendap.co-ops.nos.noaa.gov/axis/webservices/wind/wsdl,ArrayOfData</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <property name="stationId" type="string"/>
+    <property name="stationName" type="string"/>
+    <property name="latitude" type="float"/>
+    <property name="longitude" type="float"/>
+    <property name="state" type="string"/>
+    <property name="dataSource" type="string"/>
+    <property name="COOPSDisclaimer" type="string"/>
+    <property name="beginDate" type="string"/>
+    <property name="endDate" type="string"/>
+    <property name="timeZone" type="string"/>
+    <property name="data" type="Data[]"/>
+  </entity>
+  <entity name="Data">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">Data</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">WindDummy,HighLowTidePredDummy</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="getHighLowTidePredictions">
+      <item name="propertySpecifier">data,date</item>
+    </annotation>
+    <annotation name="getWind">
+      <item name="propertySpecifier">timeStamp,WS,WD,WG,X,R</item>
+    </annotation>
+    <property name="timeStamp" type="string"/>
+    <property name="WS" type="double"/>
+    <property name="WD" type="integer"/>
+    <property name="WG" type="double"/>
+    <property name="X" type="integer"/>
+    <property name="R" type="integer"/>
+    <property name="data" type="Highlowtidepred_type[]"/>
+    <property name="date" type="string"/>
+  </entity>
+  <entity name="HighLowAndMetadata">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">HighLowAndMetadata</item>
+    </annotation>
+    <annotation name="WSDLCollectionTypes">
+      <item name="HighLowValues">http://opendap.co-ops.nos.noaa.gov/axis/webservices/highlowtidepred/wsdl,ArrayOfData</item>
+    </annotation>
+    <annotation name="service Group"/>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <property name="stationId" type="string"/>
+    <property name="stationName" type="string"/>
+    <property name="latitude" type="float"/>
+    <property name="longitude" type="float"/>
+    <property name="state" type="string"/>
+    <property name="dataSource" type="string"/>
+    <property name="COOPSDisclaimer" type="string"/>
+    <property name="beginDate" type="string"/>
+    <property name="endDate" type="string"/>
+    <property name="datum" type="string"/>
+    <property name="unit" type="string"/>
+    <property name="timeZone" type="string"/>
+    <property name="HighLowValues" type="Data[]"/>
+  </entity>
+  <entity name="Highlowtidepred_type">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">Highlowtidepred_type</item>
+    </annotation>
+    <annotation name="service Group"/>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <property name="time" type="string"/>
+    <property name="pred" type="double"/>
+    <property name="type" type="string"/>
+  </entity>
+  <service name="RedRacerWS">
+    <annotation name="ActionScriptGeneration">
+      <item name="WSDL-service">RedRacerWS</item>
+      <item name="ServiceType">WebService</item>
+      <item name="WSDL">http://timemachine.regattared.com/RedRacerWS.asmx?WSDL</item>
+      <item name="Package">services.redracerws</item>
+      <item name="WSDL-port">RedRacerWSSoap</item>
+    </annotation>
+    <annotation name="ServiceTypeGroup">
+      <item name="ServiceBackendType">WebService</item>
+    </annotation>
+    <annotation name="ServiceConfig">
+      <item name="DEFAULT_ENTITY_PACKAGE">valueObjects</item>
+      <item name="WSDL-endpoint">http://timemachine.regattared.com/RedRacerWS.asmx</item>
+      <item name="LINKED_FILE"></item>
+    </annotation>
+    <function name="emailRaceCourse" return-type="WSResponse">
+      <annotation name="analyze group">
+        <item name="analyzed">true</item>
+      </annotation>
+      <annotation name="WSDLName">
+        <item name="SOAPAction">http://tempuri.org/emailRaceCourse</item>
+        <item name="emailRaceCourse">http://tempuri.org/,emailRaceCourse</item>
+      </annotation>
+      <annotation name="original signature">
+        <item name="inputParams">integer,string,string,string,string</item>
+        <item name="returnType">WSResponse</item>
+      </annotation>
+      <annotation name="ValidProperties">
+        <item name="propertySpecifier">valid,message</item>
+      </annotation>
+      <parameter name="key" type="integer"/>
+      <parameter name="salt" type="string"/>
+      <parameter name="email" type="string"/>
+      <parameter name="raceCourseString" type="string"/>
+      <parameter name="elapsedTime" type="string"/>
+    </function>
+    <function name="emailGPX" return-type="WSResponse">
+      <annotation name="analyze group">
+        <item name="analyzed">true</item>
+      </annotation>
+      <annotation name="WSDLName">
+        <item name="emailGPX">http://tempuri.org/,emailGPX</item>
+        <item name="SOAPAction">http://tempuri.org/emailGPX</item>
+      </annotation>
+      <annotation name="original signature">
+        <item name="inputParams">integer,string,string,string</item>
+        <item name="returnType">WSResponse</item>
+      </annotation>
+      <parameter name="key" type="integer"/>
+      <parameter name="salt" type="string"/>
+      <parameter name="email" type="string"/>
+      <parameter name="gpx" type="string"/>
+    </function>
+  </service>
+  <entity name="WSResponse">
+    <annotation name="EntityProperties">
+      <item name="EntityOriginalName">WSResponse</item>
+    </annotation>
+    <annotation name="service Group">
+      <item name="service">RedRacerWS</item>
+    </annotation>
+    <annotation name="ServerProperties">
+      <item name="IncludeRemoteClass">nonempty</item>
+    </annotation>
+    <annotation name="ActionScriptGeneration">
+      <item name="Package">valueObjects</item>
+    </annotation>
+    <annotation name="emailRaceCourse">
+      <item name="propertySpecifier">valid,message</item>
+    </annotation>
+    <property name="valid" type="boolean"/>
+    <property name="message" type="string"/>
+  </entity>
+</model>

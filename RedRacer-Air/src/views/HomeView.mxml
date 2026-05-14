@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009"
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		xmlns:Components="Components.*"
+		actionBarVisible="true" 
+		overlayControls="true"
+		tabBarVisible="true" 
+		title="[RED] Racer" 
+		initialize="initializeHandler(event)" 
+		viewActivate="viewActivateHandler(event)"
+		viewDeactivate="viewDeactivateHandler(event)">
+	
+	<s:states>
+		<s:State name="portrait"/>
+		<s:State name="landscape"/>
+	</s:states>
+
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<s:navigationContent>
+		<s:Image width="29" height="29" source="@Embed('images/IconHome.png')" />
+	</s:navigationContent>
+
+	
+	<fx:Script>
+		<![CDATA[
+			
+			import mx.events.FlexEvent;
+			import mx.rpc.CallResponder;
+			
+			import spark.events.ViewNavigatorEvent;
+			
+			
+			import Land.AtHome;
+			
+			import Line.RaceTimer;
+			
+			import Model.Course.RaceCourse;
+			
+			import Race.CourseCurrentView;
+			
+			import Utilities.DateAndTime;
+			
+			[Bindable]private var dVersion:String;
+			private var rwsResponder:CallResponder;
+			
+			
+			
+			protected function initializeHandler(event:FlexEvent):void
+			{
+				var descriptor:XML = NativeApplication.nativeApplication.applicationDescriptor;
+				var ns:Namespace = descriptor.namespaceDeclarations()[0];
+				dVersion = descriptor.ns::versionNumber; // display it at bottom of screen
+				
+				dTileGroup.animateFlag= gVar.animateFirstRun; 
+				
+			}
+
+			protected function viewActivateHandler(event:ViewNavigatorEvent):void
+			{
+				// we start in idle mode --> GPS is on, slow updates
+				//gVar.masterC.setIdleMode();
+
+				// animate once per run
+				gVar.animateFirstRun = false;	
+
+				// now set the details information on the nav tiles
+				var settingDetails:Array = new Array;
+				if (gVar.vessel.polars == null) 
+					settingDetails.push("No polars set");
+				settingDetails.push(gVar.waypoints.length.toString() + " waypoints and " + gVar.marks.length.toString() + " marks");
+				//settingDetails.push("Vessel is " + gVar.vessel.name);
+				dtLand.details = settingDetails;
+				
+				// update @the line with timer & favorability info
+				settingDetails = new Array;				
+				if (gVar.course.isStartLineValid) // if we have a valid startline ==> calculate info
+					settingDetails.push(gVar.masterC.lineFavorabilityStatus);
+				dtLine.details = settingDetails;
+				
+				// now create the RACE array
+				settingDetails = new Array;
+				if (gVar.course.status == RaceCourse.ST_INPROGRESS) 
+					settingDetails.push("Racing! ET: " + DateAndTime.elapsedTime(gVar.course.startTime, new Date));
+				if (gVar.course.status == RaceCourse.ST_COMPLETED) 
+					settingDetails.push("Finished in: " + DateAndTime.elapsedTime(gVar.course.startTime, gVar.course.endTime));
+				if (gVar.course.courseString == null)
+					settingDetails.push("No course set");
+				else
+					settingDetails.push("Course: "+gVar.course.courseString + " x " + gVar.course.repeat);
+				dtCourse.details = settingDetails;
+
+//				// let's ask for rating
+//				if (ApplicationRater.isSupported)
+//					ApplicationRater.service.applicationLaunched();
+
+				
+			}
+			
+			protected function viewDeactivateHandler(event:ViewNavigatorEvent):void
+			{
+			}
+			
+
+
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<s:SlideViewTransition id="viewTransition" direction="down" duration="500" transitionControlsWithContent="false" />
+	</fx:Declarations>
+	<s:Image source="images/Sunrise.png" width="100%" height="100%" scaleMode="zoom" />
+
+	
+	<Components:dTileGroup id="dTileGroup" width="320"
+						   borderVisible="false" horizontalCenter="0"
+						   verticalCenter.portrait="0" bottom.landscape="0">
+		<Components:dTile id="dtLand" width="90%" backgroundColor="0x20aeff" 
+						  label="On Land"
+						  click="{navigator.pushView(AtHome)}"
+						  icon="images/icon_calendar.jpg" />
+		<Components:dTile id="dtLine" width="90%" backgroundColor="0x78ba00" 
+						  label="At The Line"
+						  click="{navigator.pushView(RaceTimer)}"
+						  icon="@Embed('images/icon_timer.png')"/>
+		<Components:dTile id="dtCourse" width="90%" backgroundColor="0xff991d" 
+						  label="On the Course"
+						  click="{navigator.pushView(CourseCurrentView)}"
+						  icon="images/icon_dashboard.png"/>
+	</Components:dTileGroup>
+
+
+</s:View>

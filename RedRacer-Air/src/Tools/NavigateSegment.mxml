@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		title="Leg" 
+		xmlns:Components="Components.*"
+		initialize="initializeHandler(event)"
+		creationComplete="creationCompleteHandler(event)"
+		removedFromStage="removedHandler(event)">
+	<s:states>
+		<s:State name="portrait"/>
+		<s:State name="landscape"/>
+	</s:states>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import Model.Course.CourseLeg;
+			import Model.Course.CourseMark;
+			
+			protected var changeFrom:Boolean;
+			
+			protected function initializeHandler(event:FlexEvent):void
+			{
+				if (data == null)
+				{
+					if (gVar.navigateSegment == null)
+						gVar.navigateSegment = new CourseLeg(new CourseMark(), new CourseMark());
+				}
+				else
+				{
+					gVar.navigateSegment = data as CourseLeg;
+				}
+			}
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				updateWind();
+			}
+
+			
+			
+			protected function removedHandler(event:Event):void
+			{
+				if (spWaypoint) spWaypoint.removeEventListener(Event.CHANGE, waypointSelectionChange);
+				cbSelectWaypoint.close();
+			}
+			
+			protected function waypointSelectionChange(event:Event):void
+			{
+				if (changeFrom)
+					gVar.navigateSegment.beginMark = new CourseMark(spWaypoint.selectedPoint);
+				else
+					gVar.navigateSegment.endMark = new CourseMark(spWaypoint.selectedPoint);
+
+				gVar.navigateSegment.refresh();
+								
+				spWaypoint.removeEventListener(Event.CHANGE, waypointSelectionChange);
+				cbSelectWaypoint.close();
+				
+				// get the wind angle relative to the leg bearing
+				updateWind();
+				
+
+			}
+			
+			protected function fromGroup_clickHandler(event:MouseEvent):void
+			{
+				changeFrom = true;
+				cbSelectWaypoint.open(lblFrom);
+				spWaypoint.addEventListener(Event.CHANGE, waypointSelectionChange);
+			}
+			
+			protected function ToGroup_clickHandler(event:MouseEvent):void
+			{
+				changeFrom = false;
+				cbSelectWaypoint.open(lblTo);
+				spWaypoint.addEventListener(Event.CHANGE, waypointSelectionChange);
+			}
+			
+			protected function updateWind():void
+			{
+				dgDistance.value = gVar.navigateSegment.range;
+				dgAngle.value = gVar.navigateSegment.bearing;
+				
+				dgWind.value = gVar.navigateSegment.calculateWind(gVar.vData.currentData.trueWindDirection);
+				var minA:Number = gVar.navigateSegment.calculateWind(gVar.masterC.raTWD.minValue);
+				var maxA:Number = gVar.navigateSegment.calculateWind(gVar.masterC.raTWD.minValue);
+				
+				// update the VesselRose
+				vwdNextMark.refresh(dgWind.value, minA, maxA);
+			}
+			
+			
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<s:Callout id="cbSelectWaypoint">
+			<Components:SelectPoint id="spWaypoint" width="250" height="250"/>
+		</s:Callout>
+	</fx:Declarations>
+	<s:Group id="grpMaster"  right="5" left="5" top="5" bottom="5">
+		<s:layout.landscape>
+			<s:HorizontalLayout horizontalAlign="center" />
+		</s:layout.landscape>
+		<s:layout.portrait>
+			<s:VerticalLayout horizontalAlign="center"/>
+		</s:layout.portrait>
+		<s:VGroup width.portrait="{width-20}" width.landscape="{width/2-20}" horizontalAlign="center">
+			<s:Group width="100%">
+				<s:VGroup id="grpFrom" click="fromGroup_clickHandler(event)" left="0" width="50%">
+					<s:Label text="From" width="100%" textAlign="center" />
+					<s:Label id="lblFrom" width="100%" fontSize="16" fontWeight="bold"  textAlign="center"
+							 text="{(gVar.navigateSegment.beginMark.name==null?'SELECT':gVar.navigateSegment.beginMark.name)}"/>
+				</s:VGroup>
+				<s:VGroup id="grpTo" click="ToGroup_clickHandler(event)" right="0" width="50%">
+					<s:Label text="To" width="100%" textAlign="center"/>
+					<s:Label id="lblTo" width="100%" fontSize="16" fontWeight="bold" textAlign="center"
+							 text="{(gVar.navigateSegment.endMark.name==null?'SELECT':gVar.navigateSegment.endMark.name)}" />
+				</s:VGroup>
+			</s:Group>
+			<s:Rect width="90%" height="2" >
+				<s:fill>
+					<s:SolidColor color="#AAA7A7" />
+				</s:fill>
+			</s:Rect>
+			
+			<s:HGroup width="100%">
+				<Components:dGaugeDistance id="dgDistance" label="Range:" distance="{gVar.distance}" width="50%"/>
+				<Components:dGaugeAngle id="dgAngle" label="Bearing:" bearing="{gVar.bearing}" width="50%"/>
+			</s:HGroup>
+			<s:HGroup width="100%">
+				<Components:dGaugeNumeric id="dgWind" label="Wind @" precision="1" width="50%"/>
+				<Components:dGauge id="dgMinMax" label="+/-" width="50%"/>
+			</s:HGroup>
+		</s:VGroup>
+		<Components:VesselWindRose id="vwdNextMark" 
+					width.portrait="{grpMaster.height/2}" height.portrait="{grpMaster.height/2}"
+					width.landscape="{grpMaster.width/2}" height.landscape="{grpMaster.width/2}"/>
+	</s:Group>
+	
+</s:View>

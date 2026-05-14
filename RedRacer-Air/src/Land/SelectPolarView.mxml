@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" title="SelectPolarView"
+		initialize="initializeHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			import Model.Performance.Polars;
+			
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			
+			[Embed(source = "./polarResources/B367_polars.xml", mimeType = "text/xml")]
+			protected var B367_polars:Class;
+			[Embed(source = "./polarResources/Farr 40.xml", mimeType = "text/xml")]
+			protected var Farr40_polars:Class;
+			[Embed(source = "./polarResources/Frers_33.xml", mimeType = "text/xml")]
+			protected var Frers33_polars:Class;
+			[Embed(source = "./polarResources/J22_polars.xml", mimeType = "text/xml")]
+			protected var J22_polars:Class;
+			[Embed(source = "./polarResources/J109.xml", mimeType = "text/xml")]
+			protected var J109_polars:Class;
+			[Embed(source = "./polarResources/Melges32.xml", mimeType = "text/xml")]
+			protected var Melges32_polars:Class;
+			[Embed(source = "./polarResources/Schock34_polars.xml", mimeType = "text/xml")]
+			protected var Schock34_polars:Class;
+			[Embed(source = "./polarResources/Tartan4100.xml", mimeType = "text/xml")]
+			protected var Tartan4100_polars:Class;
+			[Embed(source = "./polarResources/X442.xml", mimeType = "text/xml")]
+			protected var X442_polars:Class;
+			
+			protected var polarsList:ArrayCollection;
+
+			protected function initializeHandler(event:FlexEvent):void
+			{
+				polarsList = new ArrayCollection([ 
+					{name:"Beneteau 36.7",data:B367_polars},
+					{name:"Farr 40",data:Farr40_polars},
+					{name:"Frers 33",data:Frers33_polars},
+					{name:"J22",data:J22_polars},
+					{name:"J109",data:J109_polars},
+					{name:"Melges32",data:Melges32_polars},
+					{name:"W.D.Schock 34",data:Schock34_polars},
+					{name:"Tartan 4100",data:Tartan4100_polars},
+					{name:"X-Yacht 44",data:X442_polars},
+				]);
+					lstPolars.dataProvider = polarsList;
+			}
+
+			
+			protected function lstPolars_clickHandler(event:MouseEvent):void
+			{
+					gVar.vessel.polars = new Polars();
+					gVar.vessel.polars.loadFromXML(lstPolars.selectedItem.data.data as XML);
+					navigator.popView();
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<s:List id="lstPolars" width="100%" height="100%"
+			click="lstPolars_clickHandler(event)"
+			labelField="name" />
+			
+</s:View>
