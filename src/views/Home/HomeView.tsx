@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { version } from '../../../package.json';
 import { AnimatedTile } from '../../components/common/AnimatedTile';
 import { TopBar } from '../../components/common/NavBar';
 import { useCourseStore } from '../../store/courseStore';
@@ -66,6 +67,7 @@ export function HomeView() {
           onClick={() => navigate('/race')}
           index={2}
         />
+        <p className="text-center text-white/70 text-sm mt-2">v{version}</p>
       </main>
     </div>
   );

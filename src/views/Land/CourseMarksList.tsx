@@ -1,10 +1,17 @@
 import { useNavigate } from 'react-router-dom';
 import { TopBar } from '../../components/common/NavBar';
 import { useMarkStore } from '../../store/markStore';
+import { useCourseStore } from '../../store/courseStore';
 
 export function CourseMarksList() {
   const navigate = useNavigate();
   const { marks } = useMarkStore();
+  const { course } = useCourseStore();
+
+  const coursePoints = [
+    course.rcBoat && { key: 'rc', emoji: '🚢', name: 'RC Boat', point: course.rcBoat },
+    course.pinMark && { key: 'pin', emoji: '📍', name: 'Pin Mark', point: course.pinMark },
+  ].filter(Boolean) as { key: string; emoji: string; name: string; point: { lat: number; lon: number } }[];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -18,7 +25,28 @@ export function CourseMarksList() {
             + Add
           </button>
         </div>
-        {marks.length === 0 && (
+
+        {coursePoints.length > 0 && (
+          <>
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Current Course</p>
+            <ul className="space-y-2 mb-4">
+              {coursePoints.map(({ key, emoji, name, point }) => (
+                <li key={key}>
+                  <div className="w-full bg-green-50 border border-green-200 rounded-xl px-4 py-3 flex items-center gap-3">
+                    <span className="text-xl">{emoji}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-gray-800">{name}</div>
+                      <div className="text-xs text-gray-400 font-mono">{point.lat.toFixed(5)}, {point.lon.toFixed(5)}</div>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Saved Marks</p>
+          </>
+        )}
+
+        {marks.length === 0 && coursePoints.length === 0 && (
           <p className="text-gray-400 text-center mt-8">No marks yet. Tap + Add to create one.</p>
         )}
         <ul className="space-y-2">

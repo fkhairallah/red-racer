@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { TopBar } from '../../components/common/NavBar';
 import { GaugeAngle, GaugeDistance } from '../../components/gauges/Gauge';
 import { useGeoStore } from '../../store/geoStore';
 import { useWaypointStore } from '../../store/waypointStore';
+import { useMarkStore } from '../../store/markStore';
+import { useCourseStore } from '../../store/courseStore';
 import { useSettingsStore } from '../../store/settingsStore';
 
 function bearingBetween(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -22,13 +24,43 @@ function distanceNm(lat1: number, lon1: number, lat2: number, lon2: number): num
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+interface LocateEntry {
+  id: string;
+  name: string;
+  lat: number;
+  lon: number;
+  group: string;
+}
+
 export function LocatePoint() {
   const { currentPoint } = useGeoStore();
   const { waypoints } = useWaypointStore();
+  const { marks } = useMarkStore();
+  const { course } = useCourseStore();
   const { bearing: bearingPrefs } = useSettingsStore();
-  const [selectedId, setSelectedId] = useState(waypoints[0]?.id ?? '');
 
-  const target = waypoints.find((w) => w.id === selectedId);
+  const entries = useMemo<LocateEntry[]>(() => {
+    const list: LocateEntry[] = [];
+
+    if (course.rcBoat) list.push({ id: '__rc', name: 'RC Boat', lat: course.rcBoat.lat, lon: course.rcBoat.lon, group: 'Course' });
+    if (course.pinMark) list.push({ id: '__pin', name: 'Pin Mark', lat: course.pinMark.lat, lon: course.pinMark.lon, group: 'Course' });
+
+    for (const m of marks) {
+      if (m.lat != null && m.lon != null) {
+        list.push({ id: `mark:${m.id}`, name: m.name, lat: m.lat, lon: m.lon, group: 'Marks' });
+      }
+    }
+
+    for (const w of waypoints) {
+      list.push({ id: `wp:${w.id}`, name: w.name, lat: w.lat, lon: w.lon, group: 'Waypoints' });
+    }
+
+    return list;
+  }, [course.rcBoat, course.pinMark, marks, waypoints]);
+
+  const [selectedId, setSelectedId] = useState('');
+  const resolvedId = selectedId || entries[0]?.id || '';
+  const target = entries.find((e) => e.id === resolvedId);
 
   let bearing: number | undefined;
   let distance: number | undefined;
@@ -37,29 +69,42 @@ export function LocatePoint() {
     distance = distanceNm(currentPoint.lat, currentPoint.lon, target.lat, target.lon);
   }
 
+  const groups = ['Course', 'Marks', 'Waypoints'];
+
   return (
     <div className="min-h-screen bg-gray-50">
       <TopBar title="Locate Point" />
       <main className="pt-14 pb-20 px-4 mt-4 space-y-4">
         <label className="block">
-          <span className="text-sm text-gray-600">Select Waypoint</span>
+          <span className="text-sm text-gray-600">Select Point</span>
           <select
             className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2"
-            value={selectedId}
+            value={resolvedId}
             onChange={(e) => setSelectedId(e.target.value)}
           >
-            {waypoints.map((wp) => (
-              <option key={wp.id} value={wp.id}>{wp.name}</option>
-            ))}
+            {groups.map((group) => {
+              const groupEntries = entries.filter((e) => e.group === group);
+              if (groupEntries.length === 0) return null;
+              return (
+                <optgroup key={group} label={group}>
+                  {groupEntries.map((e) => (
+                    <option key={e.id} value={e.id}>{e.name}</option>
+                  ))}
+                </optgroup>
+              );
+            })}
           </select>
         </label>
 
         {target && (
           <div className="bg-white rounded-xl shadow-sm p-4">
             <p className="font-semibold">{target.name}</p>
-            {target.description && <p className="text-sm text-gray-500">{target.description}</p>}
             <p className="text-xs font-mono text-gray-400 mt-1">{target.lat.toFixed(5)}, {target.lon.toFixed(5)}</p>
           </div>
+        )}
+
+        {entries.length === 0 && (
+          <p className="text-gray-400 text-center text-sm">No waypoints or marks saved yet.</p>
         )}
 
         <div className="grid grid-cols-2 gap-3">

@@ -4,14 +4,14 @@ import { useCourseStore } from '../../store/courseStore';
 import { useSettingsStore } from '../../store/settingsStore';
 
 const raceActions = [
-  { label: 'Course Chart', path: '/race/chart', emoji: '🗺️' },
-  { label: 'Wind Predictor', path: '/race/wind', emoji: '💨' },
-  { label: 'Monitor Polars', path: '/race/polars', emoji: '📐' },
-  { label: 'Layline Predictor', path: '/race/layline', emoji: '📏' },
-  { label: 'Start Line Bias', path: '/race/line-bias', emoji: '🧭' },
-  { label: 'Locate Point', path: '/tools/locate', emoji: '🎯' },
-  { label: 'Navigate Segment', path: '/tools/navigate', emoji: '🔭' },
-  { label: 'Stopwatch', path: '/tools/stopwatch', emoji: '⏱️' },
+  { label: 'Course Chart', path: '/race/chart', emoji: '🗺️', nmea: false },
+  { label: 'Layline Predictor', path: '/race/layline', emoji: '📏', nmea: true },
+  { label: 'Locate Point', path: '/tools/locate', emoji: '🎯', nmea: false },
+  { label: 'Stopwatch', path: '/tools/stopwatch', emoji: '⏱️', nmea: false },
+  { label: 'Navigate Segment', path: '/tools/navigate', emoji: '🔭', nmea: false },
+  { label: 'Monitor Polars', path: '/race/polars', emoji: '📐', nmea: true },
+  { label: 'Start Line Bias', path: '/race/line-bias', emoji: '🧭', nmea: false },
+  { label: 'Wind Predictor', path: '/race/wind', emoji: '💨', nmea: true },
 ];
 
 export function AtRace() {
@@ -19,6 +19,7 @@ export function AtRace() {
   const { course, endRace, clearCourse, advanceLeg, returnToPreviousLeg } = useCourseStore();
   const { instrumentMode } = useSettingsStore();
   const instrumentPath = instrumentMode === 'manual' ? '/race/simple' : '/race/instruments';
+  const hasNmea = instrumentMode !== 'manual';
 
   const currentMarkId = course.markIds[course.currentLegIndex];
 
@@ -57,17 +58,24 @@ export function AtRace() {
             </div>
             <span className="text-gray-500">›</span>
           </button>
-          {raceActions.map(({ label, path, emoji }) => (
-            <button
-              key={path}
-              onClick={() => navigate(path)}
-              className="flex items-center gap-4 bg-gray-800 rounded-xl px-4 py-4 text-left active:bg-gray-700"
-            >
-              <span className="text-2xl">{emoji}</span>
-              <span className="font-medium">{label}</span>
-              <span className="ml-auto text-gray-500">›</span>
-            </button>
-          ))}
+          {raceActions.map(({ label, path, emoji, nmea }) => {
+            const disabled = nmea && !hasNmea;
+            return (
+              <button
+                key={path}
+                onClick={() => !disabled && navigate(path)}
+                disabled={disabled}
+                className={`flex items-center gap-4 rounded-xl px-4 py-4 text-left ${disabled ? 'bg-gray-800/50 text-gray-600 cursor-not-allowed' : 'bg-gray-800 active:bg-gray-700'}`}
+              >
+                <span className={`text-2xl ${disabled ? 'opacity-40' : ''}`}>{emoji}</span>
+                <div className="flex-1">
+                  <span className="font-medium">{label}</span>
+                  {disabled && <p className="text-xs text-gray-600">Requires NMEA</p>}
+                </div>
+                <span className={disabled ? 'text-gray-700' : 'text-gray-500'}>›</span>
+              </button>
+            );
+          })}
         </div>
         <div className="mt-3 flex flex-col gap-3">
           {course.startTime && (
