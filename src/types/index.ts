@@ -54,9 +54,25 @@ export interface PolarEntry {
   heel?: number;
 }
 
+export interface TackAngleCondition {
+  name: string;
+  twsRange: string;
+  label: string;
+  tackAngle: number;
+}
+
+export interface BoatInfo {
+  name: string;
+  maker: string;
+  model: string;
+  year: string;
+}
+
 export interface Polars {
   name: string;
-  entries: PolarEntry[];
+  boat?: BoatInfo;
+  tackAngles?: TackAngleCondition[];
+  factoryPolars: PolarEntry[];
 }
 
 export interface PerformancePoint {

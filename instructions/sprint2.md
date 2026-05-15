@@ -1,0 +1,3 @@
+- on the simpleintrumentview, add a card to display the tack angle. Use current heading, the wind directions/speed, and look at the polar file tackAngles to show the type of tack (port/stb) and the magnetic heading.
+- convert all polar resources to json format. It's 2026 after all!
+- cleaned up the line start screen

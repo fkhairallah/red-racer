@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { TopBar } from '../../components/common/NavBar';
 import { useCourseStore } from '../../store/courseStore';
+import { useSettingsStore } from '../../store/settingsStore';
 
 const raceActions = [
-  { label: 'Instrument Panel', path: '/race/instruments', emoji: '📊' },
   { label: 'Course Chart', path: '/race/chart', emoji: '🗺️' },
   { label: 'Wind Predictor', path: '/race/wind', emoji: '💨' },
   { label: 'Monitor Polars', path: '/race/polars', emoji: '📐' },
@@ -17,6 +17,8 @@ const raceActions = [
 export function AtRace() {
   const navigate = useNavigate();
   const { course, endRace, advanceLeg, returnToPreviousLeg } = useCourseStore();
+  const { instrumentMode } = useSettingsStore();
+  const instrumentPath = instrumentMode === 'manual' ? '/race/simple' : '/race/instruments';
 
   const currentMarkId = course.markIds[course.currentLegIndex];
 
@@ -39,6 +41,19 @@ export function AtRace() {
         )}
 
         <div className="grid grid-cols-1 gap-3">
+          <button
+            onClick={() => navigate(instrumentPath)}
+            className="flex items-center gap-4 bg-gray-800 rounded-xl px-4 py-4 text-left active:bg-gray-700"
+          >
+            <span className="text-2xl">📊</span>
+            <div className="flex-1">
+              <span className="font-medium">Instrument Panel</span>
+              {instrumentMode === 'manual' && (
+                <p className="text-xs text-gray-400">Simple view · no NMEA</p>
+              )}
+            </div>
+            <span className="text-gray-500">›</span>
+          </button>
           {raceActions.map(({ label, path, emoji }) => (
             <button
               key={path}

@@ -28,7 +28,7 @@ export function PolarTable() {
             </tr>
           </thead>
           <tbody>
-            {polars.entries.map((e, i) => (
+            {polars.factoryPolars.map((e, i) => (
               <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                 <td className="px-3 py-1">{e.tws.toFixed(1)}</td>
                 <td className="px-3 py-1">{e.twa.toFixed(1)}</td>

@@ -13,7 +13,7 @@ export function PolarsView() {
         <div className="bg-white rounded-xl shadow-sm p-4 mb-4">
           <p className="text-sm text-gray-500">Active polars</p>
           <p className="font-semibold text-gray-800 text-lg">{polars?.name ?? 'None loaded'}</p>
-          {polars && <p className="text-sm text-gray-500">{polars.entries.length} entries</p>}
+          {polars && <p className="text-sm text-gray-500">{polars.factoryPolars.length} entries</p>}
         </div>
 
         <p className="text-xs text-gray-400 mb-3 text-center">

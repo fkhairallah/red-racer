@@ -4,6 +4,8 @@ import { useGeoStore } from '../../store/geoStore';
 import { useCourseStore } from '../../store/courseStore';
 import { useMarkStore } from '../../store/markStore';
 import { useSettingsStore } from '../../store/settingsStore';
+import { useVesselStore } from '../../store/vesselStore';
+import type { Polars } from '../../types';
 
 function bearingBetween(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
@@ -24,6 +26,29 @@ function distanceNm(lat1: number, lon1: number, lat2: number, lon2: number): num
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+function getTackInfo(heading: number, windDir: number, windSpeed: number, polars: Polars | null) {
+  const windRelative = ((windDir - heading) + 360) % 360;
+  const tack: 'port' | 'starboard' = windRelative <= 180 ? 'starboard' : 'port';
+
+  let tackAngle = 90;
+  let conditionLabel = '';
+  if (polars?.tackAngles?.length) {
+    const cond = polars.tackAngles.find((c) => {
+      if (c.twsRange.endsWith('+')) return windSpeed >= parseFloat(c.twsRange);
+      const [min, max] = c.twsRange.split('-').map(parseFloat);
+      return windSpeed >= min && windSpeed < max;
+    }) ?? polars.tackAngles[polars.tackAngles.length - 1];
+    if (cond) { tackAngle = cond.tackAngle; conditionLabel = cond.label; }
+  }
+
+  // starboard tack heading = windDir - θ/2, port tack heading = windDir + θ/2
+  const tackToHeading = tack === 'starboard'
+    ? ((windDir + tackAngle / 2) + 360) % 360
+    : ((windDir - tackAngle / 2) + 360) % 360;
+
+  return { tack, tackToHeading: Math.round(tackToHeading), tackAngle, conditionLabel };
+}
+
 function formatElapsed(start: Date): string {
   const ms = Date.now() - start.getTime();
   const h = Math.floor(ms / 3600000);
@@ -36,8 +61,18 @@ export function SimpleInstrumentView() {
   const { currentPoint } = useGeoStore();
   const { course, advanceLeg, returnToPreviousLeg } = useCourseStore();
   const { marks } = useMarkStore();
-  const { manualWind } = useSettingsStore();
+  const { manualWind, instrumentMode } = useSettingsStore();
+  const { polars } = useVesselStore();
   const [elapsed, setElapsed] = useState('');
+
+  const windDir = instrumentMode === 'manual'
+    ? manualWind.direction
+    : (currentPoint?.trueWindDirection ?? manualWind.direction);
+  const windSpeed = instrumentMode === 'manual'
+    ? manualWind.speed
+    : (currentPoint?.trueWindSpeed ?? manualWind.speed);
+  const heading = currentPoint?.courseOverGround ?? currentPoint?.trueHeading;
+  const tackInfo = heading != null ? getTackInfo(heading, windDir, windSpeed, polars) : null;
 
   const nextMark = marks.find((m) => m.id === course.markIds[course.currentLegIndex]);
 
@@ -94,6 +129,26 @@ export function SimpleInstrumentView() {
             {markBearing != null ? `${Math.round(markBearing)}°` : '—'}
           </p>
         </div>
+
+        {/* Tack card */}
+        {tackInfo && (
+          <div className="bg-gray-800 rounded-xl p-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs text-gray-400 mb-1">Current Tack</p>
+              <p className={`text-2xl font-bold ${tackInfo.tack === 'starboard' ? 'text-green-400' : 'text-red-400'}`}>
+                {tackInfo.tack === 'starboard' ? 'STBD' : 'PORT'}
+              </p>
+              {tackInfo.conditionLabel && (
+                <p className="text-xs text-gray-400 mt-1">{tackInfo.conditionLabel} · {tackInfo.tackAngle}°</p>
+              )}
+            </div>
+            <div className="text-right">
+              <p className="text-xs text-gray-400 mb-1">Tack to</p>
+              <p className="text-4xl font-mono font-bold tabular-nums">{tackInfo.tackToHeading}°</p>
+              <p className="text-xs text-gray-400 mt-1">{tackInfo.tack === 'starboard' ? 'port' : 'stbd'} hdg</p>
+            </div>
+          </div>
+        )}
 
         {/* Distance + Speed row */}
         <div className="grid grid-cols-2 gap-3">

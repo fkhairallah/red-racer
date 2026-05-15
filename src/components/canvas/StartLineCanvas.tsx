@@ -35,7 +35,7 @@ function toWindUp(
   return [cx + xRot * scale, cy - yRot * scale];
 }
 
-function computeBias(
+export function computeBias(
   rcBoat: GPSPoint,
   pin: GPSPoint,
   windDir: number,
@@ -208,15 +208,6 @@ export function StartLineCanvas({
     ctx.fillText('P', px, py);
     ctx.textBaseline = 'alphabetic';
 
-    // Favored star label
-    if (bias.favored !== 'Square') {
-      const [fx, fy] = bias.favored === 'RC' ? [rx, ry] : [px, py];
-      ctx.font = 'bold 10px sans-serif';
-      ctx.fillStyle = '#4ade80';
-      ctx.textAlign = 'center';
-      ctx.fillText(`★ ${bias.favored}`, fx, fy - dotR - 4);
-    }
-
     // Boat
     if (boatLat != null && boatLon != null) {
       const [bx, by] = toXY(boatLat, boatLon);
@@ -226,15 +217,46 @@ export function StartLineCanvas({
       ctx.fill();
     }
 
-    // Bias text at bottom
-    ctx.font = '10px sans-serif';
-    ctx.fillStyle = '#9ca3af';
+    // Favored-end overlay — two-line labels in the lower strip
+    // PIN always anchored left half, RC always anchored right half (wind-up convention)
+    const line1Y = height - 36;
+    const line2Y = height - 10;
+    const leftX = cx / 2;
+    const rightX = cx + cx / 2;
+    ctx.textBaseline = 'alphabetic';
     ctx.textAlign = 'center';
-    const biasLabel =
-      bias.favored === 'Square'
-        ? 'Square line'
-        : `${Math.abs(bias.biasAngle).toFixed(0)}° bias — ${bias.favored} favored`;
-    ctx.fillText(biasLabel, cx, height - 4);
+
+    if (bias.favored === 'Square') {
+      ctx.font = 'bold 20px sans-serif';
+      ctx.fillStyle = '#9ca3af';
+      ctx.fillText('PIN', leftX, line2Y);
+      ctx.fillText('RC', rightX, line2Y);
+    } else {
+      // Pin label
+      if (bias.favored === 'Pin') {
+        ctx.fillStyle = '#4ade80';
+        ctx.font = 'bold 22px sans-serif';
+        ctx.fillText('★ PIN', leftX, line1Y);
+        ctx.font = 'bold 17px sans-serif';
+        ctx.fillText(`FAVORED  ${Math.abs(bias.biasAngle).toFixed(0)}°`, leftX, line2Y);
+      } else {
+        ctx.fillStyle = '#374151';
+        ctx.font = 'bold 20px sans-serif';
+        ctx.fillText('PIN', leftX, line2Y);
+      }
+      // RC label
+      if (bias.favored === 'RC') {
+        ctx.fillStyle = '#4ade80';
+        ctx.font = 'bold 22px sans-serif';
+        ctx.fillText('RC ★', rightX, line1Y);
+        ctx.font = 'bold 17px sans-serif';
+        ctx.fillText(`FAVORED  ${Math.abs(bias.biasAngle).toFixed(0)}°`, rightX, line2Y);
+      } else {
+        ctx.fillStyle = '#374151';
+        ctx.font = 'bold 20px sans-serif';
+        ctx.fillText('RC', rightX, line2Y);
+      }
+    }
   }, [rcBoat, pin, boatLat, boatLon, inSequence, windDirection, width, height]);
 
   return (

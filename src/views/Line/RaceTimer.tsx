@@ -6,6 +6,33 @@ import { useGeoStore } from '../../store/geoStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import { StartLineCanvas } from '../../components/canvas/StartLineCanvas';
 
+function useWakeLock() {
+  const lockRef = useRef<WakeLockSentinel | null>(null);
+
+  useEffect(() => {
+    let released = false;
+
+    const acquire = async () => {
+      try {
+        lockRef.current = await navigator.wakeLock.request('screen');
+        lockRef.current.addEventListener('release', () => {
+          if (!released) acquire(); // re-acquire if OS released it (e.g. tab hidden then shown)
+        });
+      } catch {
+        // Wake Lock not supported or permission denied — silently ignore
+      }
+    };
+
+    acquire();
+
+    return () => {
+      released = true;
+      lockRef.current?.release().catch(() => {});
+      lockRef.current = null;
+    };
+  }, []);
+}
+
 function formatCountdown(seconds: number): string {
   const m = Math.floor(seconds / 60);
   const s = Math.floor(seconds % 60);
@@ -88,6 +115,7 @@ function WindKnob({
 // ────────────────────────────────────────────────────────────────────────────
 
 export function RaceTimer() {
+  useWakeLock();
   const navigate = useNavigate();
   const {
     course,
@@ -150,13 +178,13 @@ export function RaceTimer() {
   const handleMarkRC = () => {
     if (!currentPoint) { setStatusMsg('No GPS fix'); return; }
     setRcBoat(currentPoint.lat, currentPoint.lon);
-    setStatusMsg('RC location set');
+    setStatusMsg('');
   };
 
   const handleMarkPin = () => {
     if (!currentPoint) { setStatusMsg('No GPS fix'); return; }
     setPinMark(currentPoint.lat, currentPoint.lon);
-    setStatusMsg('Pin location set');
+    setStatusMsg('');
   };
 
   const isManual = instrumentMode === 'manual';
@@ -245,14 +273,14 @@ export function RaceTimer() {
         {!isInSequence ? (
           <>
             <div className="grid grid-cols-3 gap-3">
-              <button onClick={handleMarkPin} className="bg-orange-700 text-white rounded-lg py-3 font-semibold text-sm">
-                📍 Mark Pin
+              <button onClick={handleMarkPin} className={`${course.pinMark ? 'bg-orange-600' : 'bg-gray-700'} text-white rounded-lg py-3 font-semibold text-sm`}>
+                📍 Mark Pin{course.pinMark ? ' ✓' : ''}
               </button>
-              <button onClick={handleMarkRC} className="bg-blue-700 text-white rounded-lg py-3 font-semibold text-sm">
-                🚢 Mark RC
+              <button onClick={handleMarkRC} className={`${course.rcBoat ? 'bg-blue-600' : 'bg-gray-700'} text-white rounded-lg py-3 font-semibold text-sm`}>
+                🚢 Mark RC{course.rcBoat ? ' ✓' : ''}
               </button>
-              <button onClick={() => navigate('/line/course')} className="bg-gray-700 text-white rounded-lg py-3 font-semibold text-sm">
-                📋 Course
+              <button onClick={() => navigate('/line/course')} className={`${course.markIds.length > 0 ? 'bg-green-600' : 'bg-gray-700'} text-white rounded-lg py-3 font-semibold text-sm`}>
+                📋 Course{course.markIds.length > 0 ? ' ✓' : ''}
               </button>
             </div>
             <div className="grid grid-cols-2 gap-3">
