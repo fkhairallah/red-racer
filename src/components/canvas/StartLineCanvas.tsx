@@ -176,6 +176,17 @@ export function StartLineCanvas({
 
     const bias = computeBias(rcBoat, pin, windDirection);
 
+    // Start line bearing (Pin → RC, true)
+    const lineBearing = ((Math.atan2(dLon, dLat) * 180) / Math.PI + 360) % 360;
+    const bearingLabel = `Line  ${Math.round(lineBearing)}°`;
+    const midY = Math.round((55 + lineY) / 2); // centre of clear gap between mark and line
+    ctx.font = 'bold 13px monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#e5e7eb';
+    ctx.fillText(bearingLabel, cx, midY);
+    ctx.textBaseline = 'alphabetic';
+
     // Line
     ctx.strokeStyle = inSequence ? '#dc2626' : '#6b7280';
     ctx.lineWidth = 3;

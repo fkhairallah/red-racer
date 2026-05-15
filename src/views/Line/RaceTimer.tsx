@@ -261,6 +261,21 @@ export function RaceTimer() {
           height={canvasHeight}
         />
 
+        {/* Mark / RC / Course buttons — always visible before sequence */}
+        {!isInSequence && (
+          <div className="grid grid-cols-3 gap-3">
+            <button onClick={handleMarkPin} className={`${course.pinMark ? 'bg-orange-600' : 'bg-gray-700'} text-white rounded-lg py-3 font-semibold text-sm`}>
+              📍 Mark Pin{course.pinMark ? ' ✓' : ''}
+            </button>
+            <button onClick={handleMarkRC} className={`${course.rcBoat ? 'bg-blue-600' : 'bg-gray-700'} text-white rounded-lg py-3 font-semibold text-sm`}>
+              🚢 Mark RC{course.rcBoat ? ' ✓' : ''}
+            </button>
+            <button onClick={() => navigate('/line/course')} className={`${course.markIds.length > 0 ? 'bg-green-600' : 'bg-gray-700'} text-white rounded-lg py-3 font-semibold text-sm`}>
+              📋 Course{course.markIds.length > 0 ? ' ✓' : ''}
+            </button>
+          </div>
+        )}
+
         {/* Big countdown */}
         <div className="text-center">
           <span className="text-8xl font-mono font-bold tabular-nums">
@@ -272,17 +287,6 @@ export function RaceTimer() {
 
         {!isInSequence ? (
           <>
-            <div className="grid grid-cols-3 gap-3">
-              <button onClick={handleMarkPin} className={`${course.pinMark ? 'bg-orange-600' : 'bg-gray-700'} text-white rounded-lg py-3 font-semibold text-sm`}>
-                📍 Mark Pin{course.pinMark ? ' ✓' : ''}
-              </button>
-              <button onClick={handleMarkRC} className={`${course.rcBoat ? 'bg-blue-600' : 'bg-gray-700'} text-white rounded-lg py-3 font-semibold text-sm`}>
-                🚢 Mark RC{course.rcBoat ? ' ✓' : ''}
-              </button>
-              <button onClick={() => navigate('/line/course')} className={`${course.markIds.length > 0 ? 'bg-green-600' : 'bg-gray-700'} text-white rounded-lg py-3 font-semibold text-sm`}>
-                📋 Course{course.markIds.length > 0 ? ' ✓' : ''}
-              </button>
-            </div>
             <div className="grid grid-cols-2 gap-3">
               <button onClick={() => setLocalSeconds((s) => s + 60)} className="bg-gray-700 text-white rounded-lg py-3 font-semibold">+1 Min</button>
               <button onClick={() => setLocalSeconds((s) => Math.max(60, s - 60))} className="bg-gray-700 text-white rounded-lg py-3 font-semibold">−1 Min</button>

@@ -32,6 +32,7 @@ interface CourseState {
   startSequence: () => void;
   startRace: () => void;
   endRace: () => void;
+  clearCourse: () => void;
   postpone: () => void;
 
   setCountdown: (seconds: number) => void;
@@ -108,6 +109,20 @@ export const useCourseStore = create<CourseState>((set, get) => ({
 
   endRace: () => {
     set((s) => ({ course: { ...s.course, endTime: new Date() } }));
+    get().save();
+  },
+
+  clearCourse: () => {
+    set((s) => ({
+      course: {
+        ...s.course,
+        rcBoat: null,
+        pinMark: null,
+        markIds: [],
+        courseType: null,
+        currentLegIndex: 0,
+      },
+    }));
     get().save();
   },
 

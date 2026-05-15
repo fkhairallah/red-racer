@@ -59,6 +59,12 @@ function AppBootstrap() {
   return null;
 }
 
+function ConditionalNavBar() {
+  const isInSequence = useCourseStore((s) => s.isInSequence);
+  if (isInSequence) return null;
+  return <NavBar />;
+}
+
 export function App() {
   return (
     <BrowserRouter>
@@ -105,8 +111,7 @@ export function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
-      {/* Bottom tab bar (hidden on full-screen race views) */}
-      <NavBar />
+      <ConditionalNavBar />
     </BrowserRouter>
   );
 }

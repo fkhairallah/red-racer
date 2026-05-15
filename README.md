@@ -10,6 +10,7 @@ A mobile sailing race-management app built with React + Capacitor for Android. D
 |---------|------------|----------------------------------------|
 | 1.0.0   | 2026-05-15 | Initial release — Sprint 1 complete    |
 | 1.2.0   | 2026-05-15 | Sprint 2 — polar table, start-line bias overlay, button state feedback |
+| 1.3.0   | 2026-05-15 | Sprint 2 cont. — start-line bearing, favored-end canvas overlay, course screen scrolling, app icons, nav bar hides during countdown |
 
 ---
 
