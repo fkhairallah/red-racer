@@ -1,18 +1,25 @@
 import { useNavigate } from 'react-router-dom';
 import { TopBar } from '../../components/common/NavBar';
+import { useSettingsStore } from '../../store/settingsStore';
 
-const sections = [
-  { label: 'Waypoints', path: '/land/waypoints', emoji: '📍' },
-  { label: 'Marks', path: '/land/marks', emoji: '🚩' },
-  { label: 'Vessel Dynamics', path: '/land/vessel', emoji: '⚙️' },
-  { label: 'Vessel Polars', path: '/land/polars', emoji: '📐' },
-  { label: 'Settings', path: '/land/settings', emoji: '🔧' },
-  { label: 'Import / Export', path: '/land/import-export', emoji: '📂' },
-  { label: 'Memorize Performance', path: '/land/performance', emoji: '📊' },
+const ALL_SECTIONS = [
+  { label: 'Waypoints', path: '/land/waypoints', emoji: '📍', nmea: false },
+  { label: 'Marks', path: '/land/marks', emoji: '🚩', nmea: false },
+  { label: 'Vessel Dynamics', path: '/land/vessel', emoji: '⚙️', nmea: false },
+  { label: 'Vessel Polars', path: '/land/polars', emoji: '📐', nmea: false },
+  { label: 'Current Weather', path: '/land/weather', emoji: '🌬️', nmea: false },
+  { label: 'Settings', path: '/land/settings', emoji: '🔧', nmea: false },
+  { label: 'Import / Export', path: '/land/import-export', emoji: '📂', nmea: false },
+  { label: 'Memorize Performance', path: '/land/performance', emoji: '📊', nmea: true },
 ];
 
 export function AtHome() {
   const navigate = useNavigate();
+  const { instrumentMode } = useSettingsStore();
+  const isManual = instrumentMode === 'manual';
+
+  const sections = ALL_SECTIONS.filter((s) => !s.nmea || !isManual);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <TopBar title="On Land" />

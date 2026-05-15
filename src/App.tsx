@@ -16,6 +16,8 @@ import { PolarsView } from './views/Land/PolarsView';
 import { PolarTable } from './views/Land/PolarTable';
 import { ImportExport } from './views/Land/ImportExport';
 import { PerformanceList, PerformanceMeasure } from './views/Land/Performance';
+import { WeatherView } from './views/Land/WeatherView';
+import { SimpleInstrumentView } from './views/Race/SimpleInstrumentView';
 
 import { RaceTimer } from './views/Line/RaceTimer';
 import { CourseDefinition } from './views/Line/CourseDefinition';
@@ -77,6 +79,7 @@ export function App() {
         <Route path="/land/import-export" element={<ImportExport />} />
         <Route path="/land/performance" element={<PerformanceList />} />
         <Route path="/land/performance/new" element={<PerformanceMeasure />} />
+        <Route path="/land/weather" element={<WeatherView />} />
 
         {/* Line / start */}
         <Route path="/line" element={<RaceTimer />} />
@@ -91,6 +94,7 @@ export function App() {
         <Route path="/race/polars" element={<PolarTargetView />} />
         <Route path="/race/layline" element={<LaylineView />} />
         <Route path="/race/line-bias" element={<LineBiasView />} />
+        <Route path="/race/simple" element={<SimpleInstrumentView />} />
 
         {/* Tools */}
         <Route path="/tools/stopwatch" element={<Stopwatch />} />

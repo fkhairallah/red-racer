@@ -5,16 +5,19 @@ import { useSettingsStore } from '../../store/settingsStore';
 
 export function Settings() {
   const navigate = useNavigate();
-  const { distance, startSequenceMinutes, updateDistance, setStartSequence } = useSettingsStore();
+  const { bearing, distance, startSequenceMinutes, updateBearing, updateDistance, setStartSequence } = useSettingsStore();
 
   const [unit, setUnit] = useState<'nm' | 'km' | 'mi'>(distance.unit);
   const [speedUnit, setSpeedUnit] = useState<'kts' | 'kmh' | 'mph'>(distance.speedUnit);
   const [seqMins, setSeqMins] = useState(String(startSequenceMinutes));
+  const [declination, setDeclination] = useState(String(bearing.declination));
+  const [displayMagnetic, setDisplayMagnetic] = useState(bearing.displayMagnetic);
   const [saved, setSaved] = useState(false);
 
   const handleSave = async () => {
     await updateDistance({ unit, speedUnit });
     await setStartSequence(parseFloat(seqMins) || 5);
+    await updateBearing({ declination: parseFloat(declination) || 0, displayMagnetic });
     setSaved(true);
     setTimeout(() => navigate(-1), 800);
   };
@@ -60,6 +63,26 @@ export function Settings() {
             inputMode="decimal"
           />
         </label>
+        <div className="flex items-end gap-3">
+          <label className="flex-1 block">
+            <span className="text-sm text-gray-600">Magnetic Declination (°) — negative = W</span>
+            <input
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 font-mono"
+              value={declination}
+              onChange={(e) => setDeclination(e.target.value)}
+              inputMode="decimal"
+            />
+          </label>
+          <label className="flex items-center gap-2 pb-2">
+            <input
+              type="checkbox"
+              checked={displayMagnetic}
+              onChange={(e) => setDisplayMagnetic(e.target.checked)}
+              className="w-5 h-5"
+            />
+            <span className="text-sm text-gray-700">Display mag</span>
+          </label>
+        </div>
         <button onClick={handleSave} className={`w-full rounded-lg py-3 font-semibold text-white ${saved ? 'bg-green-600' : 'bg-red-700'}`}>
           {saved ? '✓ Saved' : 'Save'}
         </button>
